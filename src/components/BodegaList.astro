@@ -1,0 +1,356 @@
+---
+const API_BASE = 'https://feriaapp-api.onrender.com';
+---
+
+<div class="view-section" id="bodega-section">
+  <div class="view-header">
+    <h3>Bodega / Inventario</h3>
+    <button class="btn btn-primary btn-sm" id="btn-nuevo-producto">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Nuevo Producto
+    </button>
+  </div>
+
+  <div class="filters-bar">
+    <input type="text" id="filtro-productos" placeholder="Buscar por nombre, SKU..." class="filter-input"/>
+    <select id="filtro-categoria" class="filter-select">
+      <option value="">Todas las categorías</option>
+    </select>
+    <select id="filtro-stock" class="filter-select">
+      <option value="">Stock</option>
+      <option value="con_stock">Con stock</option>
+      <option value="sin_stock">Sin stock</option>
+      <option value="bajo">Stock bajo (&lt;3)</option>
+    </select>
+  </div>
+
+  <div class="stats-bar" id="stats-bodega">
+    <div class="stat-card"><span class="stat-value" id="stat-total">0</span><span class="stat-label">Productos</span></div>
+    <div class="stat-card"><span class="stat-value" id="stat-stock-total">0</span><span class="stat-label">Unidades</span></div>
+    <div class="stat-card"><span class="stat-value" id="stat-valor">$0</span><span class="stat-label">Valor bodega</span></div>
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Categoría</th>
+          <th>Talla</th>
+          <th>Stock</th>
+          <th>Precio</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="bodega-tbody">
+        <tr><td colspan="7" class="empty-state">Cargando inventario...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<dialog class="admin-modal" id="modal-stock">
+  <div class="modal-content" style="max-width: 400px;">
+    <div class="modal-header">
+      <h3 id="modal-stock-title">Ajustar Stock</h3>
+      <button class="modal-close" data-close-modal>&times;</button>
+    </div>
+    <form id="form-stock" class="modal-form">
+      <input type="hidden" id="stock-producto-id"/>
+      <div class="form-group">
+        <label>Producto</label>
+        <input type="text" id="stock-producto-nombre" readonly style="background: var(--color-muted-bg);"/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="stock-cantidad">Cantidad *</label>
+          <input type="number" id="stock-cantidad" required min="0" step="1"/>
+        </div>
+        <div class="form-group">
+          <label for="stock-motivo">Motivo</label>
+          <select id="stock-motivo">
+            <option value="ajuste_inventario">Ajuste inventario</option>
+            <option value="recepcion">Recepción</option>
+            <option value="devolucion">Devolución</option>
+            <option value="danio">Daño/Pérdida</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" data-close-modal>Cancelar</button>
+        <button type="submit" class="btn btn-primary">Actualizar Stock</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<style>
+  .view-section { margin-bottom: var(--space-8); }
+  .view-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);
+  }
+  .view-header h3 {
+    font-family: var(--font-serif); font-size: var(--text-2xl);
+    color: var(--feria-navy); margin: 0;
+  }
+  .filters-bar {
+    display: flex; flex-wrap: wrap; gap: var(--space-3);
+    margin-bottom: var(--space-5);
+  }
+  .filter-input, .filter-select { max-width: 220px; }
+
+  .stats-bar {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--space-4); margin-bottom: var(--space-6);
+  }
+  .stat-card {
+    background: var(--color-card-bg); border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl); padding: var(--space-4) var(--space-5);
+    text-align: center;
+  }
+  .stat-value {
+    display: block; font-size: var(--text-2xl); font-weight: 700;
+    color: var(--feria-navy); font-family: var(--font-serif);
+  }
+  .stat-label {
+    display: block; font-size: var(--text-xs); color: var(--color-muted);
+    text-transform: uppercase; letter-spacing: 0.05em; margin-top: var(--space-1);
+  }
+
+  .table-wrapper {
+    overflow-x: auto; background: var(--color-card-bg);
+    border-radius: var(--radius-xl); box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+  thead { background: var(--feria-navy); color: var(--color-white); }
+  th {
+    padding: var(--space-3) var(--space-4); text-align: left; font-weight: 600;
+    text-transform: uppercase; font-size: var(--text-xs); letter-spacing: 0.05em;
+  }
+  td {
+    padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--color-border);
+    color: var(--color-text); vertical-align: middle;
+  }
+  tbody tr:hover { background: var(--color-row-hover, rgba(203,168,107,0.04)); }
+  tbody tr:last-child td { border-bottom: none; }
+  .empty-state { text-align: center; padding: var(--space-8); color: var(--color-muted); font-style: italic; }
+
+  .stock-badge {
+    display: inline-flex; align-items: center; gap: var(--space-1);
+    padding: var(--space-1) var(--space-3); border-radius: var(--radius-full);
+    font-size: var(--text-xs); font-weight: 600;
+  }
+  .stock-ok { background: #dcfce7; color: #166534; }
+  .stock-bajo { background: #fef3c7; color: #92400e; }
+  .stock-cero { background: #fee2e2; color: #991b1b; }
+
+  .btn-icon {
+    background: none; border: none; cursor: pointer; padding: var(--space-2);
+    border-radius: var(--radius-md); color: var(--color-muted);
+    transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center;
+  }
+  .btn-icon:hover { background: var(--color-row-hover); color: var(--feria-navy); }
+  .btn-icon.danger:hover { color: #dc2626; background: #fee2e2; }
+
+  .admin-modal {
+    position: fixed; inset: 0; background: rgba(17, 42, 70, 0.5);
+    display: flex; align-items: center; justify-content: center;
+    padding: var(--space-4); z-index: 300; border: none;
+    width: 100%; height: 100%; max-width: none; max-height: none;
+  }
+  .admin-modal[open] { display: flex; }
+  .admin-modal::backdrop { background: rgba(17, 42, 70, 0.5); }
+  .modal-content {
+    background: var(--color-card-bg); border-radius: var(--radius-xl);
+    width: 100%; max-width: 520px; max-height: 90vh;
+    overflow-y: auto; box-shadow: var(--shadow-xl);
+  }
+  .modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--color-border);
+  }
+  .modal-header h3 { font-family: var(--font-serif); font-size: var(--text-xl); color: var(--feria-navy); margin: 0; }
+  .modal-close { background: none; border: none; font-size: var(--text-2xl); color: var(--color-muted); cursor: pointer; line-height: 1; padding: var(--space-1); transition: color 0.2s; }
+  .modal-close:hover { color: var(--feria-navy); }
+  .modal-form { padding: var(--space-6); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+  .form-group { margin-bottom: var(--space-4); }
+  .form-group label { display: block; font-size: var(--text-sm); font-weight: 600; color: var(--feria-navy); margin-bottom: var(--space-2); }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: var(--space-3) var(--space-4); border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg); font-size: var(--text-base); color: var(--color-text);
+    background: var(--color-card-bg); transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline: none; border-color: var(--feria-gold); box-shadow: 0 0 0 3px rgba(203, 168, 107, 0.15);
+  }
+  .modal-actions {
+    display: flex; justify-content: flex-end; gap: var(--space-3);
+    margin-top: var(--space-2); padding-top: var(--space-5); border-top: 1px solid var(--color-border);
+  }
+</style>
+
+<script>
+  const API_BASE = 'https://feriaapp-api.onrender.com';
+  let productosData = [];
+  let categoriasData = [];
+
+  const tbody = document.getElementById('bodega-tbody');
+  const modalStock = document.getElementById('modal-stock');
+  const formStock = document.getElementById('form-stock');
+  const filtroTexto = document.getElementById('filtro-productos');
+  const filtroCategoria = document.getElementById('filtro-categoria');
+  const filtroStock = document.getElementById('filtro-stock');
+
+  async function cargarCategorias() {
+    try {
+      const res = await fetch(`${API_BASE}/categorias`);
+      if (!res.ok) return;
+      categoriasData = await res.json();
+      filtroCategoria.innerHTML = '<option value="">Todas las categorías</option>' +
+        categoriasData.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
+    } catch (e) { console.error('Error cargando categorías', e); }
+  }
+
+  async function cargarProductos() {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Cargando inventario...</td></tr>';
+    try {
+      const res = await fetch(`${API_BASE}/productos`);
+      if (!res.ok) throw new Error('Error al cargar productos');
+      productosData = await res.json();
+      renderProductos();
+      actualizarStats();
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="7" class="empty-state">Error: ${err.message}</td></tr>`;
+    }
+  }
+
+  function getStockClass(stock) {
+    if (stock === 0) return 'stock-cero';
+    if (stock < 3) return 'stock-bajo';
+    return 'stock-ok';
+  }
+
+  function getStockLabel(stock) {
+    if (stock === 0) return 'Agotado';
+    if (stock < 3) return 'Bajo';
+    return 'OK';
+  }
+
+  function renderProductos() {
+    const texto = filtroTexto.value.toLowerCase().trim();
+    const catId = filtroCategoria.value;
+    const stockFiltro = filtroStock.value;
+
+    const filtrados = productosData.filter(p => {
+      const matchTexto = !texto || p.nombre?.toLowerCase().includes(texto) || p.sku?.toLowerCase().includes(texto);
+      const matchCat = !catId || p.categoria_id == catId;
+      let matchStock = true;
+      if (stockFiltro === 'con_stock') matchStock = (p.stock || 0) > 0;
+      if (stockFiltro === 'sin_stock') matchStock = (p.stock || 0) === 0;
+      if (stockFiltro === 'bajo') matchStock = (p.stock || 0) > 0 && (p.stock || 0) < 3;
+      return matchTexto && matchCat && matchStock;
+    });
+
+    if (filtrados.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No hay productos que coincidan.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = filtrados.map(p => `
+      <tr data-id="${p.id}">
+        <td>
+          <div style="font-weight:600;color:var(--feria-navy);">${p.nombre}</div>
+          <div style="font-size:var(--text-xs);color:var(--color-muted);">${p.sku || 'Sin SKU'}</div>
+        </td>
+        <td>${p.categoria_nombre || p.categoria || '-'}</td>
+        <td>${p.talla || '-'}</td>
+        <td><span class="stock-badge ${getStockClass(p.stock)}">${p.stock || 0} — ${getStockLabel(p.stock)}</span></td>
+        <td style="font-weight:600;">$${(p.precio_venta || 0).toLocaleString('es-CL')}</td>
+        <td>${p.estado || 'activo'}</td>
+        <td>
+          <button class="btn-icon" onclick="ajustarStock(${p.id})" title="Ajustar stock">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>
+          </button>
+          <button class="btn-icon" onclick="editarProducto(${p.id})" title="Editar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="btn-icon danger" onclick="eliminarProducto(${p.id})" title="Eliminar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function actualizarStats() {
+    const total = productosData.length;
+    const unidades = productosData.reduce((s, p) => s + (p.stock || 0), 0);
+    const valor = productosData.reduce((s, p) => s + ((p.stock || 0) * (p.precio_costo || p.precio_venta || 0)), 0);
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-stock-total').textContent = unidades;
+    document.getElementById('stat-valor').textContent = '$' + Math.round(valor).toLocaleString('es-CL');
+  }
+
+  function ajustarStock(id) {
+    const p = productosData.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('stock-producto-id').value = p.id;
+    document.getElementById('stock-producto-nombre').value = p.nombre;
+    document.getElementById('stock-cantidad').value = p.stock || 0;
+    document.getElementById('modal-stock-title').textContent = `Ajustar Stock: ${p.nombre}`;
+    modalStock.showModal();
+  }
+
+  async function editarProducto(id) {
+    sessionStorage.setItem('producto_editar_id', id);
+    window.location.href = '/bodega?editar=' + id;
+  }
+
+  async function eliminarProducto(id) {
+    const p = productosData.find(x => x.id === id);
+    if (!confirm(`¿Eliminar "${p?.nombre}" permanentemente?`)) return;
+    try {
+      const res = await fetch(`${API_BASE}/productos/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Error al eliminar');
+      await cargarProductos();
+    } catch (err) { alert('Error: ' + err.message); }
+  }
+
+  formStock.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('stock-producto-id').value;
+    const cantidad = parseInt(document.getElementById('stock-cantidad').value);
+    const motivo = document.getElementById('stock-motivo').value;
+    try {
+      const res = await fetch(`${API_BASE}/productos/${id}/stock`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stock: cantidad, motivo })
+      });
+      if (!res.ok) throw new Error('Error al actualizar stock');
+      modalStock.close();
+      await cargarProductos();
+    } catch (err) { alert('Error: ' + err.message); }
+  });
+
+  document.getElementById('btn-nuevo-producto').addEventListener('click', () => {
+    sessionStorage.removeItem('producto_editar_id');
+    window.location.href = '/bodega';
+  });
+
+  modalStock.querySelectorAll('[data-close-modal]').forEach(b => b.addEventListener('click', () => modalStock.close()));
+  modalStock.addEventListener('click', e => { if (e.target === modalStock) modalStock.close(); });
+
+  filtroTexto.addEventListener('input', renderProductos);
+  filtroCategoria.addEventListener('change', renderProductos);
+  filtroStock.addEventListener('change', renderProductos);
+
+  document.addEventListener('DOMContentLoaded', () => { cargarCategorias(); cargarProductos(); });
+</script>

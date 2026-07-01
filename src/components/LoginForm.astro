@@ -1,0 +1,196 @@
+---
+const API_BASE = 'https://feriaapp-api.onrender.com';
+---
+
+<div id="admin-login" class="admin-login">
+  <div class="admin-login__card">
+    <div class="admin-login__brand">
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M24 4L4 20h40L24 4z" fill="var(--feria-salvia)" opacity="0.9"/>
+        <path d="M24 4L14 20h20L24 4z" fill="var(--feria-bosque)"/>
+        <rect x="8" y="20" width="3" height="20" rx="1" fill="var(--feria-tierra)"/>
+        <rect x="37" y="20" width="3" height="20" rx="1" fill="var(--feria-tierra)"/>
+        <rect x="4" y="38" width="40" height="4" rx="2" fill="var(--feria-tierra-dark)"/>
+        <circle cx="24" cy="14" r="3" fill="var(--feria-crema)"/>
+      </svg>
+      <h1>FeriaApp</h1>
+      <p>Panel Administrativo</p>
+    </div>
+    <form id="login-form" class="admin-login__form">
+      <div class="form-group">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" name="email" placeholder="tu@email.com" required autocomplete="email"/>
+      </div>
+      <div class="form-group">
+        <label for="login-password">Contraseña</label>
+        <input type="password" id="login-password" name="password" placeholder="••••••••" required autocomplete="current-password"/>
+      </div>
+      <div id="login-error" class="login-error hidden"></div>
+      <button type="submit" class="btn btn-primary btn-lg" style="width:100%">
+        <span class="btn-text">Iniciar Sesión</span>
+        <span class="btn-spinner hidden"></span>
+      </button>
+    </form>
+    <p class="admin-login__hint"><a href="/">← Volver al inicio</a></p>
+  </div>
+</div>
+
+<style>
+  .admin-login {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-6);
+    background: linear-gradient(135deg, var(--feria-crema) 0%, var(--feria-crema-dark) 100%);
+  }
+
+  .admin-login.hidden { display: none; }
+
+  .admin-login__card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--color-card-bg);
+    border-radius: var(--radius-xl);
+    padding: var(--space-10) var(--space-8);
+    box-shadow: var(--shadow-xl);
+    border: 1px solid var(--color-border);
+  }
+
+  .admin-login__brand {
+    text-align: center;
+    margin-bottom: var(--space-8);
+  }
+
+  .admin-login__brand svg {
+    margin: 0 auto var(--space-4);
+    display: block;
+  }
+
+  .admin-login__brand h1 {
+    font-family: var(--font-serif);
+    font-size: var(--text-3xl);
+    color: var(--feria-bosque);
+    margin-bottom: var(--space-1);
+  }
+
+  .admin-login__brand p {
+    color: var(--feria-tierra);
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  .admin-login__form {
+    margin-bottom: var(--space-6);
+  }
+
+  .login-error {
+    background: rgba(192, 57, 43, 0.1);
+    color: var(--color-danger);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-4);
+    border: 1px solid rgba(192, 57, 43, 0.2);
+  }
+
+  .login-error.hidden {
+    display: none;
+  }
+
+  .admin-login__hint {
+    text-align: center;
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  .admin-login__hint a {
+    color: var(--feria-tierra);
+    text-decoration: none;
+  }
+
+  .admin-login__hint a:hover {
+    color: var(--feria-bosque);
+  }
+
+  .btn-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .btn-spinner.hidden {
+    display: none;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
+
+<script is:inline define:vars={{ API_BASE }}>
+  (function() {
+    const api = async (ep, opts={}) => {
+      try {
+        const res = await fetch(API_BASE + ep, {
+          headers: {
+            'Content-Type': 'application/json',
+            ...opts.headers
+          },
+          ...opts,
+          body: opts.body && typeof opts.body === 'object' ? JSON.stringify(opts.body) : opts.body
+        });
+        const data = await res.json().catch(() => null);
+        return { ok: res.ok, status: res.status, data };
+      } catch(e) {
+        return { ok: false, error: e.message };
+      }
+    };
+
+    const login = async (em, pw) => {
+      const r = await api('/auth/login', { method: 'POST', body: { email: em, password: pw } });
+      if (r?.ok && r.data?.token) {
+        localStorage.setItem('feriaapp_token', r.data.token);
+        if (r.data.user?.nombre) localStorage.setItem('feriaapp_user', JSON.stringify(r.data.user));
+        return true;
+      }
+      return false;
+    };
+
+    const form = document.getElementById('login-form');
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errEl = document.getElementById('login-error');
+      errEl?.classList.add('hidden');
+
+      const btn = e.target.querySelector('button[type="submit"]');
+      const txt = btn.querySelector('.btn-text');
+      const sp = btn.querySelector('.btn-spinner');
+      txt?.classList.add('hidden');
+      sp?.classList.remove('hidden');
+      btn.disabled = true;
+
+      const ok = await login(
+        document.getElementById('login-email').value.trim(),
+        document.getElementById('login-password').value
+      );
+
+      txt?.classList.remove('hidden');
+      sp?.classList.add('hidden');
+      btn.disabled = false;
+
+      if (ok) {
+        window.location.reload();
+      } else {
+        if (errEl) {
+          errEl.textContent = 'Email o contraseña incorrectos.';
+          errEl.classList.remove('hidden');
+        }
+      }
+    });
+  })();
+</script>

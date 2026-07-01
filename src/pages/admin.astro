@@ -1,0 +1,842 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const API_BASE = 'https://feriaapp-api.onrender.com';
+---
+
+<Layout title="FeriaApp - Panel Administrativo">
+  <div id="admin-app">
+    <!-- Loading -->
+    <div id="admin-loading" class="admin-loading">
+      <div class="loader-spinner"></div>
+      <p>Cargando panel...</p>
+    </div>
+
+    <!-- Login -->
+    <div id="admin-login" class="admin-login hidden">
+      <div class="admin-login__card">
+        <div class="admin-login__brand">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M24 4L4 20h40L24 4z" fill="var(--feria-salvia)" opacity="0.9"/>
+            <path d="M24 4L14 20h20L24 4z" fill="var(--feria-bosque)"/>
+            <rect x="8" y="20" width="3" height="20" rx="1" fill="var(--feria-tierra)"/>
+            <rect x="37" y="20" width="3" height="20" rx="1" fill="var(--feria-tierra)"/>
+            <rect x="4" y="38" width="40" height="4" rx="2" fill="var(--feria-tierra-dark)"/>
+            <circle cx="24" cy="14" r="3" fill="var(--feria-crema)"/>
+          </svg>
+          <h1>FeriaApp</h1>
+          <p>Panel Administrativo</p>
+        </div>
+        <form id="login-form" class="admin-login__form">
+          <div class="form-group">
+            <label for="login-email">Email</label>
+            <input type="email" id="login-email" name="email" placeholder="tu@email.com" required autocomplete="email"/>
+          </div>
+          <div class="form-group">
+            <label for="login-password">Contraseña</label>
+            <input type="password" id="login-password" name="password" placeholder="••••••••" required autocomplete="current-password"/>
+          </div>
+          <div id="login-error" class="login-error hidden"></div>
+          <button type="submit" class="btn btn-primary btn-lg" style="width:100%">
+            <span class="btn-text">Iniciar Sesión</span>
+            <span class="btn-spinner hidden"></span>
+          </button>
+        </form>
+        <p class="admin-login__hint"><a href="/">← Volver al inicio</a></p>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="admin-dashboard" class="admin-dashboard hidden">
+      <aside class="admin-sidebar" id="admin-sidebar">
+        <div class="admin-sidebar__header">
+          <a href="/" class="admin-sidebar__brand">
+            <svg width="28" height="28" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M24 4L4 20h40L24 4z" fill="var(--feria-salvia)" opacity="0.9"/>
+              <path d="M24 4L14 20h20L24 4z" fill="var(--feria-bosque)"/>
+              <rect x="8" y="20" width="3" height="20" rx="1" fill="var(--feria-tierra)"/>
+              <rect x="37" y="20" width="3" height="20" rx="1" fill="var(--feria-tierra)"/>
+              <rect x="4" y="38" width="40" height="4" rx="2" fill="var(--feria-tierra-dark)"/>
+              <circle cx="24" cy="14" r="3" fill="var(--feria-crema)"/>
+            </svg>
+            <span>FeriaApp</span>
+          </a>
+          <button class="admin-sidebar__close" id="sidebar-close" aria-label="Cerrar menú">×</button>
+        </div>
+        <nav class="admin-sidebar__nav" aria-label="Navegación admin">
+          <ul>
+            <li><button class="nav-item active" data-view="resumen" aria-current="page">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              Resumen
+            </button></li>
+            <li><button class="nav-item" data-view="eventos">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Eventos
+            </button></li>
+            <li><button class="nav-item" data-view="ventas">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              Ventas
+            </button></li>
+            <li><button class="nav-item" data-view="bodega">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              Bodega
+            </button></li>
+          </ul>
+        </nav>
+        <div class="admin-sidebar__footer">
+          <div class="admin-sidebar__user">
+            <div class="user-avatar" id="user-avatar">A</div>
+            <div class="user-info">
+              <span class="user-name" id="user-name">Admin</span>
+              <span class="user-role">Administrador</span>
+            </div>
+          </div>
+          <button class="btn-logout" id="btn-logout">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Cerrar Sesión
+          </button>
+        </div>
+      </aside>
+            <main class="admin-main">
+        <header class="admin-topbar">
+          <button class="admin-topbar__menu" id="sidebar-toggle" aria-label="Abrir menú">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <h2 class="admin-topbar__title" id="view-title">Resumen</h2>
+          <div class="admin-topbar__actions">
+            <span class="api-status" id="api-status">
+              <span class="status-dot"></span>
+              Conectado
+            </span>
+          </div>
+        </header>
+
+        <div class="admin-views">
+          <!-- View: Resumen -->
+          <div class="admin-view" id="view-resumen">
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-card__icon" style="background:rgba(47,93,58,0.1);color:var(--feria-bosque)">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <div class="stat-card__content">
+                  <span class="stat-card__value" id="stat-eventos">--</span>
+                  <span class="stat-card__label">Eventos Activos</span>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card__icon" style="background:rgba(138,166,122,0.15);color:var(--feria-salvia-dark)">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                </div>
+                <div class="stat-card__content">
+                  <span class="stat-card__value" id="stat-bodega">--</span>
+                  <span class="stat-card__label">Productos en Bodega</span>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card__icon" style="background:rgba(17,42,70,0.1);color:var(--feria-navy)">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div class="stat-card__content">
+                  <span class="stat-card__value" id="stat-ventas">--</span>
+                  <span class="stat-card__label">Ventas del Mes</span>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card__icon" style="background:rgba(123,90,60,0.15);color:var(--feria-tierra-dark)">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+                </div>
+                <div class="stat-card__content">
+                  <span class="stat-card__value" id="stat-ingresos">--</span>
+                  <span class="stat-card__label">Ingresos del Mes</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="dashboard-sections">
+              <div class="dashboard-section">
+                <div class="section-header-bar">
+                  <h3>Eventos Recientes</h3>
+                  <button class="btn btn-sm btn-outline" data-action="ver-eventos">Ver Todos</button>
+                </div>
+                <div class="table-wrapper">
+                  <table>
+                    <thead><tr><th>Nombre</th><th>Fecha</th><th>Estado</th><th>Ventas</th></tr></thead>
+                    <tbody id="resumen-eventos-tbody"><tr><td colspan="4" class="empty-state">Cargando...</td></tr></tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="dashboard-section">
+                <div class="section-header-bar">
+                  <h3>Ventas Recientes</h3>
+                  <button class="btn btn-sm btn-outline" data-action="ver-ventas">Ver Todas</button>
+                </div>
+                <div class="table-wrapper">
+                  <table>
+                    <thead><tr><th>Fecha</th><th>Evento</th><th>Total</th><th>Items</th></tr></thead>
+                    <tbody id="resumen-ventas-tbody"><tr><td colspan="4" class="empty-state">Cargando...</td></tr></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- View: Eventos -->
+          <div class="admin-view hidden" id="view-eventos">
+            <div class="view-header">
+              <h3>Gestión de Eventos</h3>
+              <button class="btn btn-primary btn-sm" id="btn-nuevo-evento">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Nuevo Evento
+              </button>
+            </div>
+            <div class="filters-bar">
+              <input type="text" id="filtro-eventos" placeholder="Buscar eventos..." class="filter-input"/>
+              <select id="filtro-estado" class="filter-select">
+                <option value="">Todos los estados</option>
+                <option value="activo">Activo</option>
+                <option value="cerrado">Cerrado</option>
+                <option value="programado">Programado</option>
+              </select>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead><tr><th>Nombre</th><th>Fecha</th><th>Ubicación</th><th>Estado</th><th>Ventas</th><th>Acciones</th></tr></thead>
+                <tbody id="eventos-tbody"><tr><td colspan="6" class="empty-state">Cargando eventos...</td></tr></tbody>
+              </table>
+            </div>
+            <dialog class="admin-modal" id="modal-evento">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h3 id="modal-evento-title">Nuevo Evento</h3>
+                  <button class="modal-close" data-close-modal>&times;</button>
+                </div>
+                <form id="form-evento" class="modal-form">
+                  <input type="hidden" id="evento-id"/>
+                  <div class="form-group">
+                    <label for="evento-nombre">Nombre del Evento *</label>
+                    <input type="text" id="evento-nombre" required placeholder="Ej: Feria Primavera 2026"/>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="evento-fecha">Fecha *</label>
+                      <input type="date" id="evento-fecha" required/>
+                    </div>
+                    <div class="form-group">
+                      <label for="evento-hora">Hora</label>
+                      <input type="time" id="evento-hora"/>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="evento-ubicacion">Ubicación</label>
+                    <input type="text" id="evento-ubicacion" placeholder="Ej: Plaza Central, Santiago"/>
+                  </div>
+                  <div class="form-group">
+                    <label for="evento-descripcion">Descripción</label>
+                    <textarea id="evento-descripcion" rows="3" placeholder="Detalles del evento..."></textarea>
+                  </div>
+                  <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" data-close-modal>Cancelar</button>
+                    <button type="submit" class="btn btn-primary"><span class="btn-text">Guardar</span><span class="btn-spinner hidden"></span></button>
+                  </div>
+                </form>
+              </div>
+            </dialog>
+          </div>
+
+          <!-- View: Ventas -->
+          <div class="admin-view hidden" id="view-ventas">
+            <div class="view-header">
+              <h3>Registro de Ventas</h3>
+              <button class="btn btn-primary btn-sm" id="btn-nueva-venta">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Registrar Venta
+              </button>
+            </div>
+            <div class="filters-bar">
+              <input type="text" id="filtro-ventas" placeholder="Buscar ventas..." class="filter-input"/>
+              <select id="filtro-evento-venta" class="filter-select"><option value="">Todos los eventos</option></select>
+              <input type="date" id="filtro-fecha-desde" class="filter-input" style="max-width:150px"/>
+              <input type="date" id="filtro-fecha-hasta" class="filter-input" style="max-width:150px"/>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead><tr><th>ID</th><th>Fecha</th><th>Evento</th><th>Items</th><th>Total</th><th>Método</th><th>Notas</th></tr></thead>
+                <tbody id="ventas-tbody"><tr><td colspan="7" class="empty-state">Cargando ventas...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- View: Bodega -->
+          <div class="admin-view hidden" id="view-bodega">
+            <div class="view-header">
+              <h3>Inventario de Bodega</h3>
+              <button class="btn btn-primary btn-sm" id="btn-nuevo-producto">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Nuevo Producto
+              </button>
+            </div>
+            <div class="filters-bar">
+              <input type="text" id="filtro-bodega" placeholder="Buscar productos..." class="filter-input"/>
+              <select id="filtro-categoria" class="filter-select">
+                <option value="">Todas las categorías</option>
+                <option value="ropa">Ropa</option>
+                <option value="alimentos">Alimentos</option>
+                <option value="artesanias">Artesanías</option>
+                <option value="otros">Otros</option>
+              </select>
+              <select id="filtro-stock" class="filter-select">
+                <option value="">Todo el stock</option>
+                <option value="bajo">Stock Bajo (&lt;5)</option>
+                <option value="agotado">Agotado</option>
+              </select>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead><tr><th>Código</th><th>Nombre</th><th>Categoría</th><th>Stock</th><th>Precio</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <tbody id="bodega-tbody"><tr><td colspan="7" class="empty-state">Cargando inventario...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+      <div class="admin-overlay" id="admin-overlay"></div>
+    </div>
+  </div>
+    <style is:global>
+    body { background-color: #f0ebe0; }
+
+    .admin-loading {
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: var(--space-4);
+      background: var(--feria-crema);
+      z-index: 9999;
+    }
+    .admin-loading.hidden { display: none; }
+    .admin-loading p { color: var(--feria-tierra); font-size: var(--text-sm); }
+
+    .admin-login {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: var(--space-6);
+      background: linear-gradient(135deg, var(--feria-crema) 0%, var(--feria-crema-dark) 100%);
+    }
+    .admin-login.hidden { display: none; }
+    .admin-login__card {
+      width: 100%; max-width: 420px;
+      background: var(--color-card-bg);
+      border-radius: var(--radius-xl);
+      padding: var(--space-10) var(--space-8);
+      box-shadow: var(--shadow-xl);
+      border: 1px solid var(--color-border);
+    }
+    .admin-login__brand { text-align: center; margin-bottom: var(--space-8); }
+    .admin-login__brand svg { margin: 0 auto var(--space-4); display: block; }
+    .admin-login__brand h1 {
+      font-family: var(--font-serif);
+      font-size: var(--text-3xl);
+      color: var(--feria-bosque);
+      margin-bottom: var(--space-1);
+    }
+    .admin-login__brand p { color: var(--feria-tierra); font-size: var(--text-sm); margin: 0; }
+    .admin-login__form { margin-bottom: var(--space-6); }
+    .login-error {
+      background: rgba(192, 57, 43, 0.1);
+      color: var(--color-danger);
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      margin-bottom: var(--space-4);
+      border: 1px solid rgba(192, 57, 43, 0.2);
+    }
+    .login-error.hidden { display: none; }
+    .admin-login__hint { text-align: center; font-size: var(--text-sm); margin: 0; }
+    .admin-login__hint a { color: var(--feria-tierra); text-decoration: none; }
+    .admin-login__hint a:hover { color: var(--feria-bosque); }
+
+    .admin-dashboard { display: flex; min-height: 100vh; }
+    .admin-dashboard.hidden { display: none; }
+
+    .admin-sidebar {
+      width: 260px;
+      background: var(--feria-navy);
+      color: var(--feria-crema);
+      display: flex; flex-direction: column;
+      position: fixed; left: 0; top: 0; bottom: 0;
+      z-index: 200;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+    @media (min-width: 1024px) {
+      .admin-sidebar { position: relative; transform: translateX(0); }
+    }
+    .admin-sidebar.is-open { transform: translateX(0); }
+
+    .admin-sidebar__header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-5) var(--space-6);
+      border-bottom: 1px solid rgba(245, 241, 232, 0.1);
+    }
+    .admin-sidebar__brand {
+      display: flex; align-items: center; gap: var(--space-3);
+      color: var(--feria-crema); text-decoration: none;
+      font-family: var(--font-serif); font-weight: 700; font-size: var(--text-lg);
+    }
+    .admin-sidebar__brand:hover { color: var(--feria-salvia); text-decoration: none; }
+    .admin-sidebar__close {
+      background: none; border: none; color: var(--feria-crema);
+      font-size: 1.5rem; cursor: pointer; padding: var(--space-1); line-height: 1;
+    }
+    @media (min-width: 1024px) { .admin-sidebar__close { display: none; } }
+
+    .admin-sidebar__nav { flex: 1; padding: var(--space-4) var(--space-4); }
+    .admin-sidebar__nav ul { list-style: none; margin: 0; padding: 0; }
+    .admin-sidebar__nav li { margin-bottom: var(--space-1); }
+    .nav-item {
+      display: flex; align-items: center; gap: var(--space-3);
+      width: 100%; padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-md);
+      color: rgba(245, 241, 232, 0.7);
+      font-size: var(--text-sm); font-weight: 500;
+      cursor: pointer; border: none; background: none;
+      transition: all 0.2s ease; text-align: left;
+    }
+    .nav-item:hover { background: rgba(245, 241, 232, 0.08); color: var(--feria-crema); }
+    .nav-item.active { background: var(--feria-bosque); color: white; }
+    .nav-item svg { flex-shrink: 0; }
+
+    .admin-sidebar__footer {
+      padding: var(--space-4) var(--space-6);
+      border-top: 1px solid rgba(245, 241, 232, 0.1);
+    }
+    .admin-sidebar__user {
+      display: flex; align-items: center; gap: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+    .user-avatar {
+      width: 36px; height: 36px; border-radius: var(--radius-full);
+      background: var(--feria-bosque); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: var(--text-sm);
+    }
+    .user-info { display: flex; flex-direction: column; }
+    .user-name { font-size: var(--text-sm); font-weight: 600; color: var(--feria-crema); }
+    .user-role { font-size: var(--text-xs); color: rgba(245, 241, 232, 0.5); }
+    .btn-logout {
+      display: flex; align-items: center; gap: var(--space-2);
+      width: 100%; padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-md);
+      color: rgba(245, 241, 232, 0.6);
+      font-size: var(--text-sm); background: none; border: none;
+      cursor: pointer; transition: all 0.2s ease;
+    }
+    .btn-logout:hover { background: rgba(192, 57, 43, 0.2); color: #e74c3c; }
+
+    .admin-main { flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    .admin-topbar {
+      display: flex; align-items: center; gap: var(--space-4);
+      padding: var(--space-4) var(--space-6);
+      background: var(--color-card-bg);
+      border-bottom: 1px solid var(--color-border);
+      position: sticky; top: 0; z-index: 50;
+    }
+    .admin-topbar__menu {
+      display: flex; align-items: center; justify-content: center;
+      width: 36px; height: 36px; border-radius: var(--radius-md);
+      background: none; border: none; color: var(--feria-navy); cursor: pointer;
+    }
+    @media (min-width: 1024px) { .admin-topbar__menu { display: none; } }
+    .admin-topbar__title {
+      font-family: var(--font-serif); font-size: var(--text-xl);
+      font-weight: 700; color: var(--feria-navy); margin: 0; flex: 1;
+    }
+    .admin-topbar__actions { display: flex; align-items: center; gap: var(--space-3); }
+    .api-status {
+      display: flex; align-items: center; gap: var(--space-2);
+      font-size: var(--text-xs); color: var(--feria-tierra);
+    }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #27ae60; animation: pulse 2s infinite;
+    }
+    .status-dot.offline { background: #e74c3c; animation: none; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+    .admin-views { flex: 1; padding: var(--space-6); overflow-y: auto; }
+    .admin-view.hidden { display: none; }
+    .view-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);
+    }
+    .view-header h3 {
+      font-family: var(--font-serif); font-size: var(--text-2xl);
+      color: var(--feria-navy); margin: 0;
+    }
+
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(1, 1fr);
+      gap: var(--space-5); margin-bottom: var(--space-8);
+    }
+    @media (min-width: 640px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
+
+    .stat-card {
+      background: var(--color-card-bg); border-radius: var(--radius-lg);
+      padding: var(--space-5); display: flex; align-items: center; gap: var(--space-4);
+      box-shadow: var(--shadow-sm); border: 1px solid var(--color-border);
+    }
+    .stat-card__icon {
+      width: 48px; height: 48px; border-radius: var(--radius-lg);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .stat-card__value {
+      display: block; font-family: var(--font-serif); font-size: var(--text-2xl);
+      font-weight: 700; color: var(--feria-navy); line-height: 1;
+    }
+    .stat-card__label {
+      display: block; font-size: var(--text-sm); color: var(--feria-tierra); margin-top: var(--space-1);
+    }
+
+    .dashboard-sections {
+      display: grid; grid-template-columns: 1fr; gap: var(--space-6);
+    }
+    @media (min-width: 1024px) { .dashboard-sections { grid-template-columns: 1fr 1fr; } }
+    .dashboard-section {
+      background: var(--color-card-bg); border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border); overflow: hidden;
+    }
+    .section-header-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid var(--color-border);
+      background: var(--feria-crema-light);
+    }
+    .section-header-bar h3 {
+      font-family: var(--font-serif); font-size: var(--text-lg);
+      color: var(--feria-navy); margin: 0;
+    }
+
+    .filters-bar {
+      display: flex; flex-wrap: wrap; gap: var(--space-3); margin-bottom: var(--space-5);
+    }
+    .filter-input, .filter-select { max-width: 250px; }
+    .empty-state { text-align: center; color: var(--feria-tierra); padding: var(--space-8) var(--space-4); }
+
+    .admin-modal {
+      position: fixed; inset: 0;
+      background: rgba(17, 42, 70, 0.5);
+      display: flex; align-items: center; justify-content: center;
+      padding: var(--space-4); z-index: 300; border: none;
+      width: 100%; height: 100%; max-width: none; max-height: none;
+    }
+    .admin-modal[open] { display: flex; }
+    .admin-modal::backdrop { background: rgba(17, 42, 70, 0.5); }
+    .modal-content {
+      background: var(--color-card-bg); border-radius: var(--radius-xl);
+      width: 100%; max-width: 520px; max-height: 90vh;
+      overflow-y: auto; box-shadow: var(--shadow-xl);
+    }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-5) var(--space-6);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .modal-header h3 {
+      font-family: var(--font-serif); font-size: var(--text-xl);
+      color: var(--feria-navy); margin: 0;
+    }
+    .modal-close {
+      background: none; border: none; font-size: 1.5rem;
+      color: var(--feria-tierra); cursor: pointer; padding: var(--space-1); line-height: 1;
+    }
+    .modal-close:hover { color: var(--feria-navy); }
+    .modal-form { padding: var(--space-6); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+    .modal-actions {
+      display: flex; gap: var(--space-3); justify-content: flex-end;
+      margin-top: var(--space-6); padding-top: var(--space-4);
+      border-top: 1px solid var(--color-border);
+    }
+
+    .admin-overlay {
+      position: fixed; inset: 0;
+      background: rgba(17, 42, 70, 0.3); z-index: 150; display: none;
+    }
+    .admin-overlay.is-visible { display: block; }
+    @media (min-width: 1024px) { .admin-overlay.is-visible { display: none; } }
+
+    .btn-spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid currentColor; border-top-color: transparent;
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    .btn-spinner.hidden { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+    <script is:inline define:vars={{ API_BASE }}>
+    (function() {
+      'use strict';
+      const state = {
+        token: localStorage.getItem('feriaapp_token'),
+        user: null,
+        currentView: 'resumen',
+        eventos: [], ventas: [], bodega: []
+      };
+      const $ = (s) => document.querySelector(s);
+      const $$ = (s) => document.querySelectorAll(s);
+      const fmtDate = (d) => d ? new Date(d).toLocaleDateString('es-CL',{day:'2-digit',month:'short',year:'numeric'}) : '--';
+      const fmtCur = (a) => a != null ? '$'+Number(a).toLocaleString('es-CL') : '--';
+
+      const api = async (ep, opts={}) => {
+        try {
+          const res = await fetch(API_BASE + ep, {
+            headers: {
+              'Content-Type': 'application/json',
+              ...(state.token ? {'Authorization':'Bearer '+state.token} : {}),
+              ...opts.headers
+            },
+            ...opts,
+            body: opts.body && typeof opts.body=='object' ? JSON.stringify(opts.body) : opts.body
+          });
+          const data = await res.json().catch(()=>null);
+          if (res.status===401) { logout(); return null; }
+          return {ok:res.ok, status:res.status, data};
+        } catch(e) {
+          updateApiStatus(false);
+          return {ok:false, error:e.message};
+        }
+      };
+
+      const updateApiStatus = (on) => {
+        const el=$('#api-status'), dot=el?.querySelector('.status-dot');
+        if(el&&dot){ dot.classList.toggle('offline',!on); el.childNodes[2].textContent=on?' Conectado':' Offline'; }
+      };
+
+      const login = async (em,pw) => {
+        const r=await api('/auth/login',{method:'POST',body:{email:em,password:pw}});
+        if(r?.ok&&r.data?.token){
+          state.token=r.data.token; state.user=r.data.user;
+          localStorage.setItem('feriaapp_token',r.data.token);
+          if(r.data.user?.nombre) localStorage.setItem('feriaapp_user',JSON.stringify(r.data.user));
+          return true;
+        }
+        return false;
+      };
+
+      const logout = () => {
+        state.token=null; state.user=null;
+        localStorage.removeItem('feriaapp_token');
+        localStorage.removeItem('feriaapp_user');
+        showLogin();
+      };
+
+      const checkAuth = () => {
+        const t=localStorage.getItem('feriaapp_token'), u=localStorage.getItem('feriaapp_user');
+        if(t){ state.token=t; try{state.user=JSON.parse(u)}catch(e){state.user=null;} return true;}
+        return false;
+      };
+
+      const showLogin = () => {
+        $('#admin-loading')?.classList.add('hidden');
+        $('#admin-login')?.classList.remove('hidden');
+        $('#admin-dashboard')?.classList.add('hidden');
+      };
+
+      const showDashboard = () => {
+        $('#admin-loading')?.classList.add('hidden');
+        $('#admin-login')?.classList.add('hidden');
+        $('#admin-dashboard')?.classList.remove('hidden');
+        const u=state.user;
+        if(u){ const ne=$('#user-name'),ae=$('#user-avatar');
+          if(ne)ne.textContent=u.nombre||u.email||'Admin';
+          if(ae)ae.textContent=(u.nombre?.[0]||u.email?.[0]||'A').toUpperCase();
+        }
+        loadDashboardData();
+      };
+
+      const switchView = (vn) => {
+        state.currentView=vn;
+        $$('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.view===vn));
+        const titles={resumen:'Resumen',eventos:'Eventos',ventas:'Ventas',bodega:'Bodega'};
+        const te=$('#view-title'); if(te)te.textContent=titles[vn]||vn;
+        $$('.admin-view').forEach(v=>v.classList.add('hidden'));
+        const ve=$(`#view-${vn}`); if(ve)ve.classList.remove('hidden');
+        if(vn==='eventos')loadEventos(); if(vn==='ventas')loadVentas();
+        if(vn==='bodega')loadBodega(); if(vn==='resumen')loadDashboardData();
+        closeSidebar();
+      };
+
+      const loadDashboardData = async () => {
+        const h=await api('/health'); updateApiStatus(h?.ok);
+        await Promise.all([loadEventosStats(),loadBodegaStats(),loadVentasStats()]);
+        loadResumenEventos(); loadResumenVentas();
+      };
+
+      const loadEventosStats = async () => {
+        const r=await api('/eventos?limit=1');
+        if(r?.ok){ $('#stat-eventos').textContent=r.data?.total||r.data?.length||0; }
+      };
+      const loadBodegaStats = async () => {
+        const r=await api('/bodega?limit=1');
+        if(r?.ok){ $('#stat-bodega').textContent=r.data?.total||r.data?.length||0; }
+      };
+      const loadVentasStats = async () => {
+        const now=new Date(), fd=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0];
+        const r=await api(`/ventas?desde=${fd}&limit=1`);
+        if(r?.ok){
+          const d=r.data?.items||r.data||[];
+          $('#stat-ventas').textContent=r.data?.total||d.length||0;
+          $('#stat-ingresos').textContent=fmtCur(d.reduce((s,v)=>s+(v.total||0),0));
+        }
+      };
+
+      const loadResumenEventos = async () => {
+        const r=await api('/eventos?limit=5&orden=desc'), tb=$('#resumen-eventos-tbody');
+        if(!tb)return; if(!r?.ok||!r.data?.length){tb.innerHTML='<tr><td colspan="4" class="empty-state">No hay eventos registrados</td></tr>';return;}
+        tb.innerHTML=r.data.slice(0,5).map(e=>{
+          const ec=e.estado==='activo'?'badge-success':e.estado==='cerrado'?'badge-danger':'badge-warning';
+          return `<tr><td><strong>${e.nombre||'Sin nombre'}</strong></td><td>${fmtDate(e.fecha)}</td><td><span class="badge ${ec}">${e.estado||'N/A'}</span></td><td>${fmtCur(e.total_ventas||0)}</td></tr>`;
+        }).join('');
+      };
+
+      const loadResumenVentas = async () => {
+        const r=await api('/ventas?limit=5&orden=desc'), tb=$('#resumen-ventas-tbody');
+        if(!tb)return; if(!r?.ok||!r.data?.length){tb.innerHTML='<tr><td colspan="4" class="empty-state">No hay ventas registradas</td></tr>';return;}
+        tb.innerHTML=r.data.slice(0,5).map(v=>`<tr><td>${fmtDate(v.fecha)}</td><td>${v.evento_nombre||v.evento_id||'N/A'}</td><td><strong>${fmtCur(v.total)}</strong></td><td>${v.cantidad_items||v.items?.length||0}</td></tr>`).join('');
+      };
+
+      const loadEventos = async () => {
+        const r=await api('/eventos'), tb=$('#eventos-tbody');
+        if(!tb)return; state.eventos=r?.data||[];
+        if(!state.eventos.length){tb.innerHTML='<tr><td colspan="6" class="empty-state">No hay eventos. Crea el primero.</td></tr>';return;}
+        renderEventos(state.eventos);
+      };
+      const renderEventos = (evs) => {
+        const tb=$('#eventos-tbody');
+        tb.innerHTML=evs.map(e=>{
+          const ec=e.estado==='activo'?'badge-success':e.estado==='cerrado'?'badge-danger':'badge-warning';
+          const pc=e.estado==='activo';
+          return `<tr data-id="${e.id}"><td><strong>${e.nombre||'Sin nombre'}</strong></td><td>${fmtDate(e.fecha)}</td><td>${e.ubicacion||'--'}</td><td><span class="badge ${ec}">${e.estado||'N/A'}</span></td><td>${fmtCur(e.total_ventas||0)}</td><td><div style="display:flex;gap:4px">${pc?`<button class="btn btn-sm btn-danger" data-action="cerrar" data-id="${e.id}">Cerrar</button>`:''}<button class="btn btn-sm btn-outline" data-action="editar" data-id="${e.id}">Editar</button></div></td></tr>`;
+        }).join('');
+      };
+
+      const loadVentas = async () => {
+        const r=await api('/ventas'), tb=$('#ventas-tbody');
+        if(!tb)return; state.ventas=r?.data||[];
+        if(!state.ventas.length){tb.innerHTML='<tr><td colspan="7" class="empty-state">No hay ventas registradas</td></tr>';return;}
+        renderVentas(state.ventas);
+      };
+      const renderVentas = (vs) => {
+        $('#ventas-tbody').innerHTML=vs.map(v=>`<tr><td>#${v.id||'--'}</td><td>${fmtDate(v.fecha)}</td><td>${v.evento_nombre||v.evento_id||'N/A'}</td><td>${v.cantidad_items||v.items?.length||0}</td><td><strong>${fmtCur(v.total)}</strong></td><td>${v.metodo_pago||'Efectivo'}</td><td><span style="font-size:0.75rem;color:var(--feria-tierra)">${v.notas||'--'}</span></td></tr>`).join('');
+      };
+
+      const loadBodega = async () => {
+        const r=await api('/bodega'), tb=$('#bodega-tbody');
+        if(!tb)return; state.bodega=r?.data||[];
+        if(!state.bodega.length){tb.innerHTML='<tr><td colspan="7" class="empty-state">Bodega vacía. Agrega productos.</td></tr>';return;}
+        renderBodega(state.bodega);
+      };
+      const renderBodega = (ps) => {
+        $('#bodega-tbody').innerHTML=ps.map(p=>{
+          const sb=(p.stock||0)<5&&(p.stock||0)>0, ag=(p.stock||0)===0;
+          const ec=ag?'badge-danger':sb?'badge-warning':'badge-success';
+          const et=ag?'Agotado':sb?'Stock Bajo':'Disponible';
+          return `<tr data-id="${p.id}"><td><code style="font-size:0.75rem">${p.codigo||p.id}</code></td><td><strong>${p.nombre||'Sin nombre'}</strong></td><td>${p.categoria||'--'}</td><td>${p.stock||0}</td><td>${fmtCur(p.precio)}</td><td><span class="badge ${ec}">${et}</span></td><td><button class="btn btn-sm btn-outline" data-action="editar-producto" data-id="${p.id}">Editar</button></td></tr>`;
+        }).join('');
+      };
+
+      const cerrarEvento = async (id) => {
+        if(!confirm('¿Cerrar este evento? Las ventas quedarán archivadas.'))return;
+        const r=await api(`/eventos/${id}/cerrar`,{method:'POST'});
+        if(r?.ok){loadEventos();loadDashboardData();}
+      };
+
+      const openSidebar = () => { $('#admin-sidebar')?.classList.add('is-open'); $('#admin-overlay')?.classList.add('is-visible'); };
+      const closeSidebar = () => { $('#admin-sidebar')?.classList.remove('is-open'); $('#admin-overlay')?.classList.remove('is-visible'); };
+
+      const init = () => {
+        if(checkAuth())showDashboard(); else showLogin();
+
+        $('#login-form')?.addEventListener('submit',async(e)=>{
+          e.preventDefault();
+          $('#login-error')?.classList.add('hidden');
+          const btn=e.target.querySelector('button[type="submit"]');
+          const txt=btn.querySelector('.btn-text'), sp=btn.querySelector('.btn-spinner');
+          txt?.classList.add('hidden'); sp?.classList.remove('hidden'); btn.disabled=true;
+          const ok=await login($('#login-email').value.trim(),$('#login-password').value);
+          txt?.classList.remove('hidden'); sp?.classList.add('hidden'); btn.disabled=false;
+          if(ok)showDashboard(); else { const le=$('#login-error'); if(le){le.textContent='Email o contraseña incorrectos.';le.classList.remove('hidden');} }
+        });
+
+        $('#btn-logout')?.addEventListener('click',logout);
+        $('#sidebar-toggle')?.addEventListener('click',openSidebar);
+        $('#sidebar-close')?.addEventListener('click',closeSidebar);
+        $('#admin-overlay')?.addEventListener('click',closeSidebar);
+        $$('.nav-item').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));
+
+        $('#btn-nuevo-evento')?.addEventListener('click',()=>{
+          $('#modal-evento-title').textContent='Nuevo Evento';
+          $('#evento-id').value=''; $('#form-evento').reset();
+          $('#modal-evento')?.showModal();
+        });
+        $$('[data-close-modal]').forEach(b=>b.addEventListener('click',()=>$('#modal-evento')?.close()));
+
+        $('#form-evento')?.addEventListener('submit',async(e)=>{
+          e.preventDefault();
+          const btn=e.target.querySelector('button[type="submit"]');
+          const txt=btn.querySelector('.btn-text'), sp=btn.querySelector('.btn-spinner');
+          txt?.classList.add('hidden'); sp?.classList.remove('hidden'); btn.disabled=true;
+          const r=await api('/eventos',{method:'POST',body:{
+            nombre:$('#evento-nombre').value,
+            fecha:$('#evento-fecha').value,
+            hora:$('#evento-hora').value||null,
+            ubicacion:$('#evento-ubicacion').value||null,
+            descripcion:$('#evento-descripcion').value||null
+          }});
+          txt?.classList.remove('hidden'); sp?.classList.add('hidden'); btn.disabled=false;
+          if(r?.ok){$('#modal-evento')?.close();loadEventos();loadDashboardData();}
+          else alert('Error: '+(r?.data?.error||'Error desconocido'));
+        });
+
+        document.addEventListener('click',(e)=>{
+          const b=e.target.closest('[data-action]'); if(!b)return;
+          const a=b.dataset.action, id=b.dataset.id;
+          if(a==='cerrar'&&id)cerrarEvento(id);
+          if(a==='editar'&&id)alert('Editar evento #'+id+' - En desarrollo');
+          if(a==='editar-producto'&&id)alert('Editar producto #'+id+' - En desarrollo');
+          if(a==='ver-eventos')switchView('eventos');
+          if(a==='ver-ventas')switchView('ventas');
+        });
+
+        $('#filtro-eventos')?.addEventListener('input',(e)=>{
+          const q=e.target.value.toLowerCase();
+          renderEventos(state.eventos.filter(ev=>(ev.nombre||'').toLowerCase().includes(q)||(ev.ubicacion||'').toLowerCase().includes(q)));
+        });
+        $('#filtro-estado')?.addEventListener('change',(e)=>{
+          const st=e.target.value;
+          renderEventos(st?state.eventos.filter(ev=>ev.estado===st):state.eventos);
+        });
+        $('#filtro-bodega')?.addEventListener('input',(e)=>{
+          const q=e.target.value.toLowerCase();
+          renderBodega(state.bodega.filter(p=>(p.nombre||'').toLowerCase().includes(q)||(p.codigo||'').toLowerCase().includes(q)));
+        });
+        $('#filtro-categoria')?.addEventListener('change',(e)=>{
+          const c=e.target.value;
+          renderBodega(c?state.bodega.filter(p=>p.categoria===c):state.bodega);
+        });
+        $('#filtro-stock')?.addEventListener('change',(e)=>{
+          const t=e.target.value;
+          let f=state.bodega;
+          if(t==='bajo')f=state.bodega.filter(p=>(p.stock||0)<5&&(p.stock||0)>0);
+          if(t==='agotado')f=state.bodega.filter(p=>(p.stock||0)===0);
+          renderBodega(f);
+        });
+      };
+
+      setTimeout(init,200);
+    })();
+  </script>
+</Layout>

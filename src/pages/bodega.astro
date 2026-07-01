@@ -1,0 +1,43 @@
+---
+import AdminLayout from '../layouts/Layout.astro';
+import BodegaList from '../components/BodegaList.astro';
+import ProductoForm from '../components/ProductoForm.astro';
+---
+
+<AdminLayout title="Bodega — FeriaApp">
+  <div class="page-bodega">
+    <div class="page-header">
+      <h1>Bodega</h1>
+      <p class="page-subtitle">Gestión de inventario y productos</p>
+    </div>
+
+    <BodegaList />
+
+    <!-- ProductoForm se muestra condicionalmente vía JS -->
+    <div id="producto-form-container" style="display: none;">
+      <ProductoForm />
+    </div>
+  </div>
+</AdminLayout>
+
+<style>
+  .page-bodega { padding: var(--space-6) var(--space-8); max-width: 1200px; margin: 0 auto; }
+  .page-header { margin-bottom: var(--space-8); }
+  .page-header h1 {
+    font-family: var(--font-serif); font-size: var(--text-3xl);
+    color: var(--feria-navy); margin: 0 0 var(--space-2);
+  }
+  .page-subtitle { color: var(--color-muted); margin: 0; font-size: var(--text-lg); }
+</style>
+
+<script>
+  // Mostrar formulario si hay parámetro ?editar= o ?nuevo
+  const params = new URLSearchParams(window.location.search);
+  const bodegaSection = document.getElementById('bodega-section');
+  const formContainer = document.getElementById('producto-form-container');
+
+  if (params.has('editar') || params.has('nuevo')) {
+    if (bodegaSection) bodegaSection.style.display = 'none';
+    formContainer.style.display = 'block';
+  }
+</script>

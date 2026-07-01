@@ -1,0 +1,583 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import FeatureIcon from '../components/FeatureIcon.astro';
+
+const features = [
+  {
+    icon: 'calendar',
+    title: 'Gestión de Eventos',
+    description: 'Crea, programa y gestiona ferias comunitarias. Controla fechas, ubicaciones y estado de cada evento en tiempo real.'
+  },
+  {
+    icon: 'box',
+    title: 'Inventario de Bodega',
+    description: 'Mantén el control total de tu stock. Categoriza productos, seguimiento de entradas y salidas, alertas de stock bajo.'
+  },
+  {
+    icon: 'dollar-sign',
+    title: 'Registro de Ventas',
+    description: 'Registra cada transacción de forma rápida. Análisis de ingresos, productos más vendidos y tendencias.'
+  },
+  {
+    icon: 'bar-chart',
+    title: 'Resumen y Estadísticas',
+    description: 'Dashboard con métricas clave: ventas por feria, rendimiento de productos, comparativas entre eventos.'
+  },
+  {
+    icon: 'users',
+    title: 'Multi-usuario',
+    description: 'Sistema de autenticación seguro. Diferentes niveles de acceso para administradores y colaboradores.'
+  },
+  {
+    icon: 'shield',
+    title: 'Datos Seguros',
+    description: 'Tus datos permanecen privados. Sin tracking, sin publicidad. Arquitectura diseñada para la confianza.'
+  }
+];
+
+const steps = [
+  {
+    number: '01',
+    title: 'Crea tu Evento',
+    description: 'Define la fecha, ubicación y detalles de tu feria comunitaria en segundos.'
+  },
+  {
+    number: '02',
+    title: 'Gestiona tu Bodega',
+    description: 'Registra productos, actualiza stock y organiza tu inventario antes de cada feria.'
+  },
+  {
+    number: '03',
+    title: 'Registra Ventas',
+    description: 'Durante la feria, registra cada venta rápidamente desde cualquier dispositivo.'
+  },
+  {
+    number: '04',
+    title: 'Analiza Resultados',
+    description: 'Al cerrar el evento, revisa estadísticas detalladas y toma decisiones informadas.'
+  }
+];
+
+const stats = [
+  { value: '50+', label: 'Ferias Gestionadas' },
+  { value: '1,200+', label: 'Productos en Bodega' },
+  { value: '3,500+', label: 'Ventas Registradas' },
+  { value: '100%', label: 'Hecho en Chile' }
+];
+---
+
+<Layout title="FeriaApp - Gestión de Ferias y Bodega">
+  <Header />
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero" id="inicio">
+      <div class="hero__bg">
+        <div class="hero__bg-pattern"></div>
+        <div class="hero__bg-gradient"></div>
+      </div>
+      <div class="container">
+        <div class="hero__content">
+          <div class="hero__badge">
+            <span class="badge badge-success">v1.0 Disponible</span>
+          </div>
+          <h1 class="hero__title">
+            Gestiona tus Ferias<br />
+            <span class="hero__title-accent">sin complicaciones</span>
+          </h1>
+          <p class="hero__description">
+            FeriaApp es el sistema integral para comunidades que organizan ferias
+            de ropa, alimentos y productos locales. Controla eventos, bodega y ventas
+            desde un solo lugar.
+          </p>
+          <div class="hero__actions">
+            <a href="/admin" class="btn btn-primary btn-lg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                <polyline points="10 17 15 12 10 7"/>
+                <line x1="15" y1="12" x2="3" y2="12"/>
+              </svg>
+              Ir al Panel
+            </a>
+            <a href="#features" class="btn btn-outline btn-lg">
+              Conocer Más
+            </a>
+          </div>
+          <div class="hero__stats">
+            {stats.map(stat => (
+              <div class="hero__stat">
+                <span class="hero__stat-value">{stat.value}</span>
+                <span class="hero__stat-label">{stat.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-header__eyebrow">Funciones</span>
+          <h2 class="section-header__title">Todo lo que necesitas<br />en un solo lugar</h2>
+          <p class="section-header__description">
+            Diseñado específicamente para las necesidades de ferias comunitarias
+            y pequeños emprendimientos locales.
+          </p>
+        </div>
+
+        <div class="features__grid">
+          {features.map((feature, i) => (
+            <div class="feature-card fade-in" style={`animation-delay: ${i * 0.1}s`}>
+              <div class="feature-card__icon">
+                <FeatureIcon name={feature.icon} />
+              </div>
+              <h3 class="feature-card__title">{feature.title}</h3>
+              <p class="feature-card__description">{feature.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works" id="how-it-works">
+      <div class="container">
+        <div class="section-header section-header--light">
+          <span class="section-header__eyebrow">Cómo Funciona</span>
+          <h2 class="section-header__title">Cuatro pasos simples<br />para organizar tu feria</h2>
+        </div>
+
+        <div class="steps">
+          {steps.map((step, i) => (
+            <div class="step">
+              <div class="step__number">{step.number}</div>
+              <div class="step__content">
+                <h3 class="step__title">{step.title}</h3>
+                <p class="step__description">{step.description}</p>
+              </div>
+              {i < steps.length - 1 && <div class="step__connector"></div>}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+      <div class="container">
+        <div class="cta__card">
+          <div class="cta__content">
+            <h2 class="cta__title">¿Listo para organizar tu próxima feria?</h2>
+            <p class="cta__description">
+              Accede al panel administrativo y comienza a gestionar tus eventos,
+              bodega y ventas de forma profesional.
+            </p>
+            <a href="/admin" class="btn btn-primary btn-lg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                <polyline points="10 17 15 12 10 7"/>
+                <line x1="15" y1="12" x2="3" y2="12"/>
+              </svg>
+              Acceder al Panel
+            </a>
+          </div>
+          <div class="cta__decoration">
+            <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="cta__svg">
+              <circle cx="100" cy="100" r="80" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+              <circle cx="100" cy="100" r="60" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+              <circle cx="100" cy="100" r="40" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+              <path d="M100 20 L100 180 M20 100 L180 100" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  /* ===== HERO ===== */
+  .hero {
+    position: relative;
+    min-height: calc(100vh - var(--header-height));
+    display: flex;
+    align-items: center;
+    padding: var(--space-16) 0;
+    overflow: hidden;
+  }
+
+  .hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .hero__bg-pattern {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 80%, rgba(138, 166, 122, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(47, 93, 58, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(123, 90, 60, 0.05) 0%, transparent 60%);
+  }
+
+  .hero__bg-gradient {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+    background: linear-gradient(to top, var(--feria-crema), transparent);
+  }
+
+  .hero__content {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .hero__badge {
+    margin-bottom: var(--space-6);
+  }
+
+  .hero__title {
+    font-family: var(--font-serif);
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--feria-navy);
+    margin-bottom: var(--space-6);
+  }
+
+  .hero__title-accent {
+    color: var(--feria-bosque);
+    font-style: italic;
+  }
+
+  .hero__description {
+    font-size: var(--text-lg);
+    color: var(--feria-tierra);
+    line-height: 1.7;
+    margin-bottom: var(--space-8);
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    justify-content: center;
+    margin-bottom: var(--space-16);
+  }
+
+  .hero__stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-8);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 640px) {
+    .hero__stats {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .hero__stat {
+    text-align: center;
+  }
+
+  .hero__stat-value {
+    display: block;
+    font-family: var(--font-serif);
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--feria-bosque);
+    line-height: 1;
+  }
+
+  .hero__stat-label {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--feria-tierra);
+    margin-top: var(--space-2);
+  }
+
+  /* ===== SECTION HEADER ===== */
+  .section-header {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto var(--space-12);
+  }
+
+  .section-header--light .section-header__title {
+    color: var(--feria-crema);
+  }
+
+  .section-header--light .section-header__description {
+    color: rgba(245, 241, 232, 0.7);
+  }
+
+  .section-header__eyebrow {
+    display: inline-block;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--feria-salvia);
+    margin-bottom: var(--space-4);
+  }
+
+  .section-header__title {
+    font-family: var(--font-serif);
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 700;
+    color: var(--feria-navy);
+    margin-bottom: var(--space-4);
+    line-height: 1.2;
+  }
+
+  .section-header__description {
+    font-size: var(--text-lg);
+    color: var(--feria-tierra);
+    line-height: 1.6;
+  }
+
+  /* ===== FEATURES ===== */
+  .features {
+    padding: var(--space-24) 0;
+    background-color: var(--feria-crema-light);
+  }
+
+  .features__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  @media (min-width: 640px) {
+    .features__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .features__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .feature-card {
+    background-color: var(--color-card-bg);
+    border-radius: var(--radius-xl);
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    opacity: 0;
+  }
+
+  .feature-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+    border-color: var(--feria-salvia);
+  }
+
+  .feature-card__icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(47, 93, 58, 0.1);
+    border-radius: var(--radius-lg);
+    color: var(--feria-bosque);
+    margin-bottom: var(--space-5);
+  }
+
+  .feature-card__title {
+    font-family: var(--font-serif);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--feria-navy);
+    margin-bottom: var(--space-3);
+  }
+
+  .feature-card__description {
+    font-size: var(--text-base);
+    color: var(--feria-tierra);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ===== HOW IT WORKS ===== */
+  .how-it-works {
+    padding: var(--space-24) 0;
+    background-color: var(--feria-navy);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .how-it-works::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+      radial-gradient(circle at 10% 50%, rgba(138, 166, 122, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 90% 50%, rgba(47, 93, 58, 0.08) 0%, transparent 40%);
+  }
+
+  .steps {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 768px) {
+    .steps {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .step {
+    display: flex;
+    gap: var(--space-5);
+    align-items: flex-start;
+  }
+
+  .step__number {
+    font-family: var(--font-serif);
+    font-size: var(--text-4xl);
+    font-weight: 800;
+    color: var(--feria-salvia);
+    opacity: 0.4;
+    line-height: 1;
+    flex-shrink: 0;
+    min-width: 60px;
+  }
+
+  .step__title {
+    font-family: var(--font-serif);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--feria-crema);
+    margin-bottom: var(--space-2);
+  }
+
+  .step__description {
+    color: rgba(245, 241, 232, 0.7);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ===== CTA ===== */
+  .cta {
+    padding: var(--space-24) 0;
+    background-color: var(--feria-crema);
+  }
+
+  .cta__card {
+    background-color: var(--feria-bosque);
+    border-radius: var(--radius-xl);
+    padding: var(--space-12) var(--space-8);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-8);
+    position: relative;
+    overflow: hidden;
+  }
+
+  @media (min-width: 768px) {
+    .cta__card {
+      padding: var(--space-16);
+    }
+  }
+
+  .cta__content {
+    position: relative;
+    z-index: 1;
+    max-width: 500px;
+  }
+
+  .cta__title {
+    font-family: var(--font-serif);
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    font-weight: 700;
+    color: var(--feria-crema);
+    margin-bottom: var(--space-4);
+  }
+
+  .cta__description {
+    color: rgba(245, 241, 232, 0.8);
+    font-size: var(--text-lg);
+    line-height: 1.6;
+    margin-bottom: var(--space-8);
+  }
+
+  .cta__decoration {
+    position: absolute;
+    right: -40px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.3;
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .cta__decoration {
+      display: block;
+    }
+  }
+
+  .cta__svg {
+    animation: rotateSlow 60s linear infinite;
+  }
+
+  @keyframes rotateSlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* Feature Icon SVGs inline */
+  .feature-card__icon svg {
+    stroke: currentColor;
+  }
+</style>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.feature-card').forEach(card => {
+      card.style.transform = 'translateY(20px)';
+      card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      observer.observe(card);
+    });
+  });
+</script>

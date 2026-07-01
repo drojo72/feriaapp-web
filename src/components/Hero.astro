@@ -1,0 +1,165 @@
+---
+const stats = [
+  { value: '50+', label: 'Ferias Gestionadas' },
+  { value: '1,200+', label: 'Productos en Bodega' },
+  { value: '3,500+', label: 'Ventas Registradas' },
+  { value: '100%', label: 'Hecho en Chile' }
+];
+---
+
+<section class="hero" id="inicio">
+  <div class="hero__bg">
+    <div class="hero__bg-pattern"></div>
+    <div class="hero__bg-gradient"></div>
+  </div>
+  <div class="container">
+    <div class="hero__content">
+      <div class="hero__badge">
+        <span class="badge badge-success">v1.0 Disponible</span>
+      </div>
+      <h1 class="hero__title">
+        Gestiona tus Ferias<br />
+        <span class="hero__title-accent">sin complicaciones</span>
+      </h1>
+      <p class="hero__description">
+        FeriaApp es el sistema integral para comunidades que organizan ferias
+        de ropa, alimentos y productos locales. Controla eventos, bodega y ventas
+        desde un solo lugar.
+      </p>
+      <div class="hero__actions">
+        <a href="/admin" class="btn btn-primary btn-lg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+            <polyline points="10 17 15 12 10 7"/>
+            <line x1="15" y1="12" x2="3" y2="12"/>
+          </svg>
+          Ir al Panel
+        </a>
+        <a href="#features" class="btn btn-outline btn-lg">
+          Conocer Más
+        </a>
+      </div>
+      <div class="hero__stats">
+        {stats.map(stat => (
+          <div class="hero__stat">
+            <span class="hero__stat-value">{stat.value}</span>
+            <span class="hero__stat-label">{stat.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: calc(100vh - var(--header-height));
+    display: flex;
+    align-items: center;
+    padding: var(--space-16) 0;
+    overflow: hidden;
+  }
+
+  .hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .hero__bg-pattern {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 80%, rgba(138, 166, 122, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(47, 93, 58, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(123, 90, 60, 0.05) 0%, transparent 60%);
+  }
+
+  .hero__bg-gradient {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+    background: linear-gradient(to top, var(--feria-crema), transparent);
+  }
+
+  .hero__content {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .hero__badge {
+    margin-bottom: var(--space-6);
+  }
+
+  .hero__title {
+    font-family: var(--font-serif);
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--feria-navy);
+    margin-bottom: var(--space-6);
+  }
+
+  .hero__title-accent {
+    color: var(--feria-bosque);
+    font-style: italic;
+  }
+
+  .hero__description {
+    font-size: var(--text-lg);
+    color: var(--feria-tierra);
+    line-height: 1.7;
+    margin-bottom: var(--space-8);
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    justify-content: center;
+    margin-bottom: var(--space-16);
+  }
+
+  .hero__stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-8);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 640px) {
+    .hero__stats {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .hero__stat {
+    text-align: center;
+  }
+
+  .hero__stat-value {
+    display: block;
+    font-family: var(--font-serif);
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--feria-bosque);
+    line-height: 1;
+  }
+
+  .hero__stat-label {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--feria-tierra);
+    margin-top: var(--space-2);
+  }
+</style>

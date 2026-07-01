@@ -1,0 +1,25 @@
+---
+import AdminLayout from '../layouts/Layout.astro';
+import VentasList from '../components/VentasList.astro';
+---
+
+<AdminLayout title="Histórico — FeriaApp">
+  <div class="page-historico">
+    <div class="page-header">
+      <h1>Histórico de Ventas</h1>
+      <p class="page-subtitle">Todas las transacciones registradas</p>
+    </div>
+
+    <VentasList />
+  </div>
+</AdminLayout>
+
+<style>
+  .page-historico { padding: var(--space-6) var(--space-8); max-width: 1200px; margin: 0 auto; }
+  .page-header { margin-bottom: var(--space-8); }
+  .page-header h1 {
+    font-family: var(--font-serif); font-size: var(--text-3xl);
+    color: var(--feria-navy); margin: 0 0 var(--space-2);
+  }
+  .page-subtitle { color: var(--color-muted); margin: 0; font-size: var(--text-lg); }
+</style>

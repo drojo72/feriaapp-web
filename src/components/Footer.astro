@@ -1,0 +1,267 @@
+---
+const currentYear = new Date().getFullYear();
+
+const footerLinks = {
+  producto: [
+    { label: 'Funciones', href: '/#features' },
+    { label: 'Cómo Funciona', href: '/#how-it-works' },
+    { label: 'Panel Admin', href: '/admin' }
+  ],
+  comunidad: [
+    { label: 'Granja Toquí', href: 'https://granjatoqui.cl' },
+    { label: 'Re-Vistete', href: 'https://re-vistete.cl' },
+    { label: 'Keysign Labs', href: '#' }
+  ],
+  legal: [
+    { label: 'Privacidad', href: '#' },
+    { label: 'Términos', href: '#' }
+  ]
+};
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__grid">
+      <!-- Brand Column -->
+      <div class="site-footer__brand">
+        <a href="/" class="site-footer__logo" aria-label="FeriaApp - Inicio">
+          <svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M24 4L4 20h40L24 4z" fill="var(--feria-salvia)" opacity="0.9"/>
+            <path d="M24 4L14 20h20L24 4z" fill="var(--feria-bosque)"/>
+            <rect x="8" y="20" width="3" height="20" rx="1" fill="var(--feria-tierra)"/>
+            <rect x="37" y="20" width="3" height="20" rx="1" fill="var(--feria-tierra)"/>
+            <rect x="4" y="38" width="40" height="4" rx="2" fill="var(--feria-tierra-dark)"/>
+            <circle cx="24" cy="14" r="3" fill="var(--feria-crema)"/>
+          </svg>
+          <span class="site-footer__logo-text">FeriaApp</span>
+        </a>
+        <p class="site-footer__tagline">
+          Gestión inteligente de ferias comunitarias, inventario y ventas.
+        </p>
+        <div class="site-footer__social">
+          <a href="#" aria-label="Instagram" class="site-footer__social-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+            </svg>
+          </a>
+          <a href="#" aria-label="Facebook" class="site-footer__social-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+            </svg>
+          </a>
+          <a href="#" aria-label="GitHub" class="site-footer__social-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Links Columns -->
+      <div class="site-footer__links">
+        <div class="site-footer__column">
+          <h4 class="site-footer__column-title">Producto</h4>
+          <ul class="site-footer__column-list">
+            {footerLinks.producto.map(link => (
+              <li><a href={link.href}>{link.label}</a></li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="site-footer__column">
+          <h4 class="site-footer__column-title">Comunidad</h4>
+          <ul class="site-footer__column-list">
+            {footerLinks.comunidad.map(link => (
+              <li><a href={link.href} target={link.href.startsWith('http') ? '_blank' : undefined} rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}>{link.label}</a></li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="site-footer__column">
+          <h4 class="site-footer__column-title">Legal</h4>
+          <ul class="site-footer__column-list">
+            {footerLinks.legal.map(link => (
+              <li><a href={link.href}>{link.label}</a></li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="site-footer__bottom">
+      <p class="site-footer__copyright">
+        &copy; {currentYear} FeriaApp. Un proyecto de <a href="#" class="site-footer__keysign">Keysign Labs</a>.
+      </p>
+      <p class="site-footer__made-with">
+        Hecho con <span class="heart">&#9829;</span> en Chile
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background-color: var(--feria-navy);
+    color: var(--feria-crema);
+    padding: var(--space-16) 0 var(--space-8);
+    margin-top: auto;
+  }
+
+  .site-footer__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-12);
+    margin-bottom: var(--space-12);
+  }
+
+  @media (min-width: 768px) {
+    .site-footer__grid {
+      grid-template-columns: 1fr 2fr;
+    }
+  }
+
+  .site-footer__brand {
+    max-width: 300px;
+  }
+
+  .site-footer__logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    text-decoration: none;
+    color: var(--feria-crema);
+    margin-bottom: var(--space-4);
+  }
+
+  .site-footer__logo:hover {
+    color: var(--feria-salvia);
+    text-decoration: none;
+  }
+
+  .site-footer__logo-text {
+    font-family: var(--font-serif);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+  }
+
+  .site-footer__tagline {
+    color: rgba(245, 241, 232, 0.7);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    margin-bottom: var(--space-6);
+  }
+
+  .site-footer__social {
+    display: flex;
+    gap: var(--space-3);
+  }
+
+  .site-footer__social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    background-color: rgba(245, 241, 232, 0.1);
+    color: var(--feria-crema);
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+
+  .site-footer__social-link:hover {
+    background-color: var(--feria-salvia);
+    color: var(--feria-navy);
+    text-decoration: none;
+  }
+
+  .site-footer__links {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-8);
+  }
+
+  @media (min-width: 640px) {
+    .site-footer__links {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .site-footer__column-title {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--feria-salvia);
+    margin-bottom: var(--space-4);
+  }
+
+  .site-footer__column-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .site-footer__column-list li {
+    margin-bottom: var(--space-3);
+  }
+
+  .site-footer__column-list a {
+    color: rgba(245, 241, 232, 0.7);
+    font-size: var(--text-sm);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .site-footer__column-list a:hover {
+    color: var(--feria-crema);
+    text-decoration: none;
+  }
+
+  .site-footer__bottom {
+    border-top: 1px solid rgba(245, 241, 232, 0.1);
+    padding-top: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    align-items: center;
+    text-align: center;
+  }
+
+  @media (min-width: 640px) {
+    .site-footer__bottom {
+      flex-direction: row;
+      justify-content: space-between;
+      text-align: left;
+    }
+  }
+
+  .site-footer__copyright {
+    font-size: var(--text-sm);
+    color: rgba(245, 241, 232, 0.5);
+    margin: 0;
+  }
+
+  .site-footer__keysign {
+    color: var(--feria-salvia);
+    text-decoration: none;
+  }
+
+  .site-footer__keysign:hover {
+    color: var(--feria-crema);
+    text-decoration: underline;
+  }
+
+  .site-footer__made-with {
+    font-size: var(--text-sm);
+    color: rgba(245, 241, 232, 0.5);
+    margin: 0;
+  }
+
+  .heart {
+    color: #e74c3c;
+  }
+</style>

@@ -1,0 +1,94 @@
+---
+interface Props {
+  size?: 'sm' | 'md' | 'lg';
+  showTagline?: boolean;
+  class?: string;
+}
+
+const { size = 'md', showTagline = true, class: className = '' } = Astro.props;
+
+const sizeMap = {
+  sm: { wordmark: '1.5rem', tagline: '0.65rem', icon: 28 },
+  md: { wordmark: '2rem', tagline: '0.75rem', icon: 36 },
+  lg: { wordmark: '3rem', tagline: '0.875rem', icon: 48 }
+};
+
+const s = sizeMap[size];
+---
+
+<a href="/" class={`brand-logo ${className}`} aria-label="FeriaApp - Inicio">
+  <div class="brand-logo__inner">
+    <svg
+      class="brand-logo__icon"
+      width={s.icon}
+      height={s.icon}
+      viewBox="0 0 48 48"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path d="M24 4L4 20h40L24 4z" fill="var(--feria-salvia)" opacity="0.9" />
+      <path d="M24 4L14 20h20L24 4z" fill="var(--feria-bosque)" />
+      <rect x="8" y="20" width="3" height="20" rx="1" fill="var(--feria-tierra)" />
+      <rect x="37" y="20" width="3" height="20" rx="1" fill="var(--feria-tierra)" />
+      <rect x="4" y="38" width="40" height="4" rx="2" fill="var(--feria-tierra-dark)" />
+      <circle cx="24" cy="14" r="3" fill="var(--feria-crema)" />
+    </svg>
+
+    <div class="brand-logo__text">
+      <span class="brand-logo__wordmark" style={`font-size: ${s.wordmark}`}>FeriaApp</span>
+      {showTagline && (
+        <span class="brand-logo__tagline" style={`font-size: ${s.tagline}`}>
+          Gestión de Ferias & Bodega
+        </span>
+      )}
+    </div>
+  </div>
+</a>
+
+<style>
+  .brand-logo {
+    display: inline-flex;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .brand-logo__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .brand-logo__icon {
+    flex-shrink: 0;
+    filter: drop-shadow(0 1px 2px rgba(17, 42, 70, 0.1));
+  }
+
+  .brand-logo__text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+  }
+
+  .brand-logo__wordmark {
+    font-family: var(--font-serif);
+    font-weight: 800;
+    color: var(--feria-bosque);
+    letter-spacing: -0.02em;
+    text-decoration: none;
+  }
+
+  .brand-logo:hover .brand-logo__wordmark {
+    color: var(--feria-bosque-light);
+    text-decoration: none;
+  }
+
+  .brand-logo__tagline {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    color: var(--feria-tierra);
+    letter-spacing: 0.02em;
+    margin-top: 2px;
+    text-transform: uppercase;
+  }
+</style>

@@ -1,0 +1,217 @@
+---
+const features = [
+  {
+    icon: 'calendar',
+    title: 'Gestión de Eventos',
+    description: 'Crea, programa y gestiona ferias comunitarias. Controla fechas, ubicaciones y estado de cada evento en tiempo real.'
+  },
+  {
+    icon: 'box',
+    title: 'Inventario de Bodega',
+    description: 'Mantén el control total de tu stock. Categoriza productos, seguimiento de entradas y salidas, alertas de stock bajo.'
+  },
+  {
+    icon: 'dollar-sign',
+    title: 'Registro de Ventas',
+    description: 'Registra cada transacción de forma rápida. Análisis de ingresos, productos más vendidos y tendencias.'
+  },
+  {
+    icon: 'bar-chart',
+    title: 'Resumen y Estadísticas',
+    description: 'Dashboard con métricas clave: ventas por feria, rendimiento de productos, comparativas entre eventos.'
+  },
+  {
+    icon: 'users',
+    title: 'Multi-usuario',
+    description: 'Sistema de autenticación seguro. Diferentes niveles de acceso para administradores y colaboradores.'
+  },
+  {
+    icon: 'shield',
+    title: 'Datos Seguros',
+    description: 'Tus datos permanecen privados. Sin tracking, sin publicidad. Arquitectura diseñada para la confianza.'
+  }
+];
+---
+
+<section class="features" id="features">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-header__eyebrow">Funciones</span>
+      <h2 class="section-header__title">Todo lo que necesitas<br />en un solo lugar</h2>
+      <p class="section-header__description">
+        Diseñado específicamente para las necesidades de ferias comunitarias
+        y pequeños emprendimientos locales.
+      </p>
+    </div>
+
+    <div class="features__grid">
+      {features.map((feature, i) => (
+        <div class="feature-card fade-in" style={`animation-delay: ${i * 0.1}s`}>
+          <div class="feature-card__icon">
+            {feature.icon === 'calendar' && (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            )}
+            {feature.icon === 'box' && (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                <line x1="12" y1="22.08" x2="12" y2="12"/>
+              </svg>
+            )}
+            {feature.icon === 'dollar-sign' && (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="1" x2="12" y2="23"/>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+            )}
+            {feature.icon === 'bar-chart' && (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"/>
+                <line x1="12" y1="20" x2="12" y2="4"/>
+                <line x1="6" y1="20" x2="6" y2="14"/>
+              </svg>
+            )}
+            {feature.icon === 'users' && (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            )}
+            {feature.icon === 'shield' && (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            )}
+          </div>
+          <h3 class="feature-card__title">{feature.title}</h3>
+          <p class="feature-card__description">{feature.description}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .features {
+    padding: var(--space-24) 0;
+    background-color: var(--feria-crema-light);
+  }
+
+  .section-header {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto var(--space-12);
+  }
+
+  .section-header__eyebrow {
+    display: inline-block;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--feria-salvia);
+    margin-bottom: var(--space-4);
+  }
+
+  .section-header__title {
+    font-family: var(--font-serif);
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 700;
+    color: var(--feria-navy);
+    margin-bottom: var(--space-4);
+    line-height: 1.2;
+  }
+
+  .section-header__description {
+    font-size: var(--text-lg);
+    color: var(--feria-tierra);
+    line-height: 1.6;
+  }
+
+  .features__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  @media (min-width: 640px) {
+    .features__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .features__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .feature-card {
+    background-color: var(--color-card-bg);
+    border-radius: var(--radius-xl);
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    opacity: 0;
+  }
+
+  .feature-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+    border-color: var(--feria-salvia);
+  }
+
+  .feature-card__icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(47, 93, 58, 0.1);
+    border-radius: var(--radius-lg);
+    color: var(--feria-bosque);
+    margin-bottom: var(--space-5);
+  }
+
+  .feature-card__title {
+    font-family: var(--font-serif);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--feria-navy);
+    margin-bottom: var(--space-3);
+  }
+
+  .feature-card__description {
+    font-size: var(--text-base);
+    color: var(--feria-tierra);
+    line-height: 1.6;
+    margin: 0;
+  }
+</style>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.feature-card').forEach(card => {
+      card.style.transform = 'translateY(20px)';
+      card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      observer.observe(card);
+    });
+  });
+</script>

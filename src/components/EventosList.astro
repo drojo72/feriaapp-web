@@ -1,0 +1,517 @@
+---
+const API_BASE = 'https://feriaapp-api.onrender.com';
+---
+
+<div class="view-section" id="eventos-section">
+  <div class="view-header">
+    <h3>Gestión de Eventos</h3>
+    <button class="btn btn-primary btn-sm" id="btn-nuevo-evento">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Nuevo Evento
+    </button>
+  </div>
+
+  <div class="filters-bar">
+    <input type="text" id="filtro-eventos" placeholder="Buscar eventos..." class="filter-input"/>
+    <select id="filtro-estado" class="filter-select">
+      <option value="">Todos los estados</option>
+      <option value="activo">Activo</option>
+      <option value="cerrado">Cerrado</option>
+      <option value="programado">Programado</option>
+    </select>
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Fecha</th>
+          <th>Ubicación</th>
+          <th>Estado</th>
+          <th>Ventas</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="eventos-tbody">
+        <tr><td colspan="6" class="empty-state">Cargando eventos...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<dialog class="admin-modal" id="modal-evento">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="modal-evento-title">Nuevo Evento</h3>
+      <button class="modal-close" data-close-modal>&times;</button>
+    </div>
+    <form id="form-evento" class="modal-form">
+      <input type="hidden" id="evento-id"/>
+      <div class="form-group">
+        <label for="evento-nombre">Nombre del Evento *</label>
+        <input type="text" id="evento-nombre" required placeholder="Ej: Feria Primavera 2026"/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="evento-fecha">Fecha *</label>
+          <input type="date" id="evento-fecha" required/>
+        </div>
+        <div class="form-group">
+          <label for="evento-hora">Hora</label>
+          <input type="time" id="evento-hora"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="evento-ubicacion">Ubicación</label>
+        <input type="text" id="evento-ubicacion" placeholder="Ej: Plaza Central, Santiago"/>
+      </div>
+      <div class="form-group">
+        <label for="evento-descripcion">Descripción</label>
+        <textarea id="evento-descripcion" rows="3" placeholder="Detalles del evento..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" data-close-modal>Cancelar</button>
+        <button type="submit" class="btn btn-primary">
+          <span class="btn-text">Guardar</span>
+          <span class="btn-spinner hidden"></span>
+        </button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<style>
+  .view-section { margin-bottom: var(--space-8); }
+
+  .view-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-6);
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .view-header h3 {
+    font-family: var(--font-serif);
+    font-size: var(--text-2xl);
+    color: var(--feria-navy);
+    margin: 0;
+  }
+
+  .filters-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+  }
+
+  .filter-input, .filter-select {
+    max-width: 250px;
+  }
+
+  .admin-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 42, 70, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4);
+    z-index: 300;
+    border: none;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+  }
+
+  .admin-modal[open] {
+    display: flex;
+  }
+
+  .admin-modal::backdrop {
+    background: rgba(17, 42, 70, 0.5);
+  }
+
+  .modal-content {
+    background: var(--color-card-bg);
+    border-radius: var(--radius-xl);
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-xl);
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-5) var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .modal-header h3 {
+    font-family: var(--font-serif);
+    font-size: var(--text-xl);
+    color: var(--feria-navy);
+    margin: 0;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: var(--text-2xl);
+    color: var(--color-muted);
+    cursor: pointer;
+    line-height: 1;
+    padding: var(--space-1);
+    transition: color 0.2s;
+  }
+
+  .modal-close:hover { color: var(--feria-navy); }
+
+  .modal-form { padding: var(--space-6); }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (max-width: 480px) {
+    .form-row { grid-template-columns: 1fr; }
+  }
+
+  .form-group { margin-bottom: var(--space-4); }
+
+  .form-group label {
+    display: block;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--feria-navy);
+    margin-bottom: var(--space-2);
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    background: var(--color-card-bg);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: var(--feria-gold);
+    box-shadow: 0 0 0 3px rgba(203, 168, 107, 0.15);
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+    background: var(--color-card-bg);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  thead {
+    background: var(--feria-navy);
+    color: var(--color-white);
+  }
+
+  th {
+    padding: var(--space-3) var(--space-4);
+    text-align: left;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: var(--text-xs);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text);
+    vertical-align: middle;
+  }
+
+  tbody tr:hover { background: var(--color-row-hover, rgba(203,168,107,0.04)); }
+  tbody tr:last-child td { border-bottom: none; }
+
+  .empty-state {
+    text-align: center;
+    padding: var(--space-8);
+    color: var(--color-muted);
+    font-style: italic;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .badge-activo { background: #dcfce7; color: #166534; }
+  .badge-cerrado { background: #fee2e2; color: #991b1b; }
+  .badge-programado { background: #dbeafe; color: #1e40af; }
+
+  .btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--space-2);
+    border-radius: var(--radius-md);
+    color: var(--color-muted);
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-icon:hover {
+    background: var(--color-row-hover, rgba(203,168,107,0.08));
+    color: var(--feria-navy);
+  }
+
+  .btn-icon.danger:hover { color: #dc2626; background: #fee2e2; }
+
+  .btn-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-left: var(--space-2);
+    vertical-align: middle;
+  }
+
+  .btn-spinner.hidden { display: none; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .hidden { display: none !important; }
+
+  .ventas-link {
+    color: var(--feria-gold);
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .ventas-link:hover { text-decoration: underline; }
+</style>
+
+<script>
+  const API_BASE = 'https://feriaapp-api.onrender.com';
+  let eventosData = [];
+  let eventoEditando = null;
+
+  const tbody = document.getElementById('eventos-tbody');
+  const modal = document.getElementById('modal-evento');
+  const form = document.getElementById('form-evento');
+  const btnNuevo = document.getElementById('btn-nuevo-evento');
+  const filtroTexto = document.getElementById('filtro-eventos');
+  const filtroEstado = document.getElementById('filtro-estado');
+  const modalTitle = document.getElementById('modal-evento-title');
+  const btnSubmit = form.querySelector('button[type="submit"]');
+  const btnText = btnSubmit.querySelector('.btn-text');
+  const btnSpinner = btnSubmit.querySelector('.btn-spinner');
+
+  async function cargarEventos() {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Cargando eventos...</td></tr>';
+    try {
+      const res = await fetch(`${API_BASE}/eventos`);
+      if (!res.ok) throw new Error('Error al cargar eventos');
+      eventosData = await res.json();
+      renderEventos();
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Error: ${err.message}</td></tr>`;
+    }
+  }
+
+  function formatFecha(fechaStr) {
+    if (!fechaStr) return '-';
+    const d = new Date(fechaStr);
+    return d.toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  function getBadgeClass(estado) {
+    const map = { activo: 'badge-activo', cerrado: 'badge-cerrado', programado: 'badge-programado' };
+    return map[estado?.toLowerCase()] || 'badge-programado';
+  }
+
+  function renderEventos() {
+    const texto = filtroTexto.value.toLowerCase().trim();
+    const estado = filtroEstado.value;
+
+    const filtrados = eventosData.filter(ev => {
+      const matchTexto = !texto ||
+        ev.nombre?.toLowerCase().includes(texto) ||
+        ev.ubicacion?.toLowerCase().includes(texto);
+      const matchEstado = !estado || ev.estado?.toLowerCase() === estado;
+      return matchTexto && matchEstado;
+    });
+
+    if (filtrados.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No hay eventos que coincidan con los filtros.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = filtrados.map(ev => `
+      <tr data-id="${ev.id}">
+        <td><strong>${ev.nombre}</strong></td>
+        <td>${formatFecha(ev.fecha)} ${ev.hora ? ev.hora.substring(0,5) : ''}</td>
+        <td>${ev.ubicacion || '-'}</td>
+        <td><span class="badge ${getBadgeClass(ev.estado)}">${ev.estado || 'N/A'}</span></td>
+        <td><span class="ventas-link" onclick="verVentasEvento(${ev.id}, '${ev.nombre.replace(/'/g, "\\'")}')">$${(ev.total_ventas || 0).toLocaleString('es-CL')}</span></td>
+        <td>
+          <button class="btn-icon" onclick="editarEvento(${ev.id})" title="Editar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="btn-icon danger" onclick="eliminarEvento(${ev.id})" title="Eliminar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function abrirModal(editar = false) {
+    modalTitle.textContent = editar ? 'Editar Evento' : 'Nuevo Evento';
+    if (!editar) {
+      form.reset();
+      document.getElementById('evento-id').value = '';
+      eventoEditando = null;
+    }
+    modal.showModal();
+    document.body.style.overflow = 'hidden';
+  }
+
+  function cerrarModal() {
+    modal.close();
+    document.body.style.overflow = '';
+    eventoEditando = null;
+  }
+
+  async function editarEvento(id) {
+    const ev = eventosData.find(e => e.id === id);
+    if (!ev) return;
+    eventoEditando = id;
+    document.getElementById('evento-id').value = ev.id;
+    document.getElementById('evento-nombre').value = ev.nombre || '';
+    document.getElementById('evento-fecha').value = ev.fecha ? ev.fecha.substring(0,10) : '';
+    document.getElementById('evento-hora').value = ev.hora ? ev.hora.substring(0,5) : '';
+    document.getElementById('evento-ubicacion').value = ev.ubicacion || '';
+    document.getElementById('evento-descripcion').value = ev.descripcion || '';
+    abrirModal(true);
+  }
+
+  async function eliminarEvento(id) {
+    const ev = eventosData.find(e => e.id === id);
+    if (!confirm(`¿Eliminar el evento "${ev?.nombre}"? Esta acción no se puede deshacer.`)) return;
+    try {
+      const res = await fetch(`${API_BASE}/eventos/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Error al eliminar');
+      await cargarEventos();
+    } catch (err) {
+      alert('Error al eliminar: ' + err.message);
+    }
+  }
+
+  function verVentasEvento(id, nombre) {
+    // Navegar a histórico filtrado por evento
+    sessionStorage.setItem('filtro_evento_id', id);
+    sessionStorage.setItem('filtro_evento_nombre', nombre);
+    window.location.href = '/historico';
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    btnText.textContent = 'Guardando...';
+    btnSpinner.classList.remove('hidden');
+    btnSubmit.disabled = true;
+
+    const payload = {
+      nombre: document.getElementById('evento-nombre').value.trim(),
+      fecha: document.getElementById('evento-fecha').value,
+      hora: document.getElementById('evento-hora').value || null,
+      ubicacion: document.getElementById('evento-ubicacion').value.trim() || null,
+      descripcion: document.getElementById('evento-descripcion').value.trim() || null,
+      estado: eventoEditando ? undefined : 'programado'
+    };
+
+    const url = eventoEditando ? `${API_BASE}/eventos/${eventoEditando}` : `${API_BASE}/eventos`;
+    const method = eventoEditando ? 'PUT' : 'POST';
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || `Error ${res.status}`);
+      }
+      cerrarModal();
+      await cargarEventos();
+    } catch (err) {
+      alert('Error al guardar: ' + err.message);
+    } finally {
+      btnText.textContent = 'Guardar';
+      btnSpinner.classList.add('hidden');
+      btnSubmit.disabled = false;
+    }
+  });
+
+  btnNuevo.addEventListener('click', () => abrirModal(false));
+
+  modal.querySelectorAll('[data-close-modal]').forEach(btn => {
+    btn.addEventListener('click', cerrarModal);
+  });
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) cerrarModal();
+  });
+
+  filtroTexto.addEventListener('input', renderEventos);
+  filtroEstado.addEventListener('change', renderEventos);
+
+  document.addEventListener('DOMContentLoaded', cargarEventos);
+</script>
