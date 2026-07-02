@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-const API_BASE = 'https://feriaapp-api.onrender.com';
+const API_BASE = import.meta.env.PUBLIC_API_URL || 'https://feriaapp-api.onrender.com';
 ---
 
 <Layout title="FeriaApp - Panel Administrativo">
@@ -13,7 +13,7 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
     </div>
 
     <!-- Login -->
-    <div id="admin-login" class="admin-login hidden">
+    <div id="admin-login" class="admin-login">
       <div class="admin-login__card">
         <div class="admin-login__brand">
           <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -29,8 +29,8 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
         </div>
         <form id="login-form" class="admin-login__form">
           <div class="form-group">
-            <label for="login-email">Email</label>
-            <input type="email" id="login-email" name="email" placeholder="tu@email.com" required autocomplete="email"/>
+            <label for="login-Username">Usuario</label>
+            <input type="text" id="login-username" name="username" placeholder="tu usuario" required autocomplete="username"/>
           </div>
           <div class="form-group">
             <label for="login-password">Contraseña</label>
@@ -46,8 +46,9 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
       </div>
     </div>
 
-    <!-- Dashboard -->
+    <!-- Dashboard (oculto por defecto) -->
     <div id="admin-dashboard" class="admin-dashboard hidden">
+      <!-- Sidebar -->
       <aside class="admin-sidebar" id="admin-sidebar">
         <div class="admin-sidebar__header">
           <a href="/" class="admin-sidebar__brand">
@@ -102,6 +103,7 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
         </div>
       </aside>
 
+      <!-- Main Content -->
       <main class="admin-main">
         <header class="admin-topbar">
           <button class="admin-topbar__menu" id="sidebar-toggle" aria-label="Abrir menú">
@@ -117,9 +119,7 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
         </header>
 
         <div class="admin-views">
-          <!-- ============================================================ -->
-          <!-- VIEW: RESUMEN -->
-          <!-- ============================================================ -->
+          <!-- VIEW: Resumen -->
           <div class="admin-view" id="view-resumen">
             <div class="stats-grid">
               <div class="stat-card">
@@ -188,9 +188,7 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
             </div>
           </div>
 
-          <!-- ============================================================ -->
-          <!-- VIEW: EVENTOS -->
-          <!-- ============================================================ -->
+          <!-- VIEW: Eventos (resumido) -->
           <div class="admin-view hidden" id="view-eventos">
             <div class="view-header">
               <h3>Gestión de Eventos</h3>
@@ -216,9 +214,7 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
             </div>
           </div>
 
-          <!-- ============================================================ -->
-          <!-- VIEW: VENTAS -->
-          <!-- ============================================================ -->
+          <!-- VIEW: Ventas (resumido) -->
           <div class="admin-view hidden" id="view-ventas">
             <div class="view-header">
               <h3>Registro de Ventas</h3>
@@ -241,9 +237,7 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
             </div>
           </div>
 
-          <!-- ============================================================ -->
-          <!-- VIEW: BODEGA -->
-          <!-- ============================================================ -->
+          <!-- VIEW: Bodega -->
           <div class="admin-view hidden" id="view-bodega">
             <div class="view-header">
               <h3>Inventario de Bodega</h3>
@@ -275,26 +269,16 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
             </div>
           </div>
 
-          <!-- ============================================================ -->
-          <!-- VIEW: HISTÓRICO / AUDITORÍA -->
-          <!-- ============================================================ -->
+          <!-- VIEW: Histórico -->
           <div class="admin-view hidden" id="view-historico">
             <div class="view-header">
               <h3>📊 Histórico y Auditoría</h3>
-              <div style="display:flex;gap:8px;">
-                <button class="btn btn-sm btn-outline" id="btn-refresh-auditoria">🔄 Refrescar</button>
-                <button class="btn btn-sm btn-primary" id="btn-exportar-auditoria">📥 Exportar</button>
-              </div>
+              <button class="btn btn-sm btn-outline" id="btn-refresh-auditoria">🔄 Refrescar</button>
             </div>
-
-            <!-- Tabs internos del histórico -->
             <div class="tabs-bar historico-tabs">
               <button class="tab-btn active" data-tab="auditoria">🔍 Auditoría</button>
               <button class="tab-btn" data-tab="eventos-cerrados">📋 Eventos Cerrados</button>
-              <button class="tab-btn" data-tab="flujos">🔄 Flujos de Productos</button>
             </div>
-
-            <!-- Panel: Auditoría -->
             <div class="tab-panel active" id="panel-auditoria">
               <div class="panel-header">
                 <div class="filters-bar">
@@ -306,184 +290,117 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
                     <option value="stock">📦 Ajuste de stock</option>
                     <option value="producto">🏷️ Cambio de producto</option>
                   </select>
-                  <input type="date" id="filtro-auditoria-desde" class="filter-input" style="max-width:150px"/>
-                  <input type="date" id="filtro-auditoria-hasta" class="filter-input" style="max-width:150px"/>
                 </div>
               </div>
               <div class="table-wrapper">
                 <table>
-                  <thead>
-                    <tr>
-                      <th>Fecha</th>
-                      <th>Tipo</th>
-                      <th>Usuario</th>
-                      <th>Detalle</th>
-                      <th>Justificación</th>
-                    </tr>
-                  </thead>
-                  <tbody id="historico-auditoria-tbody">
-                    <tr><td colspan="5" class="empty-state">Cargando auditoría...</td></tr>
-                  </tbody>
+                  <thead><tr><th>Fecha</th><th>Tipo</th><th>Usuario</th><th>Detalle</th><th>Justificación</th></tr></thead>
+                  <tbody id="historico-auditoria-tbody"><tr><td colspan="5" class="empty-state">Cargando auditoría...</td></tr></tbody>
                 </table>
               </div>
             </div>
-
-            <!-- Panel: Eventos Cerrados -->
             <div class="tab-panel hidden" id="panel-eventos-cerrados">
               <div class="panel-header">
                 <div class="filters-bar">
                   <input type="text" id="filtro-eventos-cerrados" placeholder="Buscar..." class="filter-input"/>
-                  <input type="date" id="filtro-eventos-desde" class="filter-input" style="max-width:150px"/>
-                  <input type="date" id="filtro-eventos-hasta" class="filter-input" style="max-width:150px"/>
                 </div>
               </div>
               <div class="table-wrapper">
                 <table>
-                  <thead>
-                    <tr>
-                      <th>Evento</th>
-                      <th>Fecha</th>
-                      <th>Total Calculado</th>
-                      <th>Total Confirmado</th>
-                      <th>Diferencia</th>
-                      <th>Fecha Cierre</th>
-                      <th>Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody id="historico-eventos-tbody">
-                    <tr><td colspan="7" class="empty-state">Cargando eventos cerrados...</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- Panel: Flujos de Productos -->
-            <div class="tab-panel hidden" id="panel-flujos">
-              <div class="panel-header">
-                <div class="filters-bar">
-                  <input type="text" id="filtro-flujos" placeholder="Buscar producto..." class="filter-input"/>
-                  <select id="filtro-flujo-tipo" class="filter-select">
-                    <option value="">Todos los flujos</option>
-                    <option value="boutique">→ Online</option>
-                    <option value="feria">→ Feria</option>
-                    <option value="donacion">→ Donación</option>
-                    <option value="retazo">→ Retazo</option>
-                  </select>
-                  <select id="filtro-flujo-estado" class="filter-select">
-                    <option value="">Todos los estados</option>
-                    <option value="disponible">Disponible</option>
-                    <option value="vendido">Vendido</option>
-                    <option value="reservado">Reservado</option>
-                    <option value="donado">Donado</option>
-                    <option value="retazo">Retazo</option>
-                  </select>
-                </div>
-              </div>
-              <div class="table-wrapper">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Producto</th>
-                      <th>Flujo</th>
-                      <th>Fecha</th>
-                      <th>Motivo</th>
-                      <th>Evaluado por</th>
-                      <th>Historia</th>
-                    </tr>
-                  </thead>
-                  <tbody id="historico-flujos-tbody">
-                    <tr><td colspan="6" class="empty-state">Cargando flujos...</td></tr>
-                  </tbody>
+                  <thead><tr><th>Evento</th><th>Fecha</th><th>Total Calculado</th><th>Total Confirmado</th><th>Diferencia</th><th>Fecha Cierre</th><th>Acciones</th></tr></thead>
+                  <tbody id="historico-eventos-tbody"><tr><td colspan="7" class="empty-state">Cargando eventos cerrados...</td></tr></tbody>
                 </table>
               </div>
             </div>
           </div>
         </div>
       </main>
-
       <div class="admin-overlay" id="admin-overlay"></div>
     </div>
+
+    <!-- ============================================================ -->
+    <!-- MODALES (DENTRO DEL DASHBOARD, OCULTOS POR DEFECTO) -->
+    <!-- ============================================================ -->
+    <div id="modal-container" class="modal-container hidden">
+      <!-- Modal: Evento -->
+      <dialog class="admin-modal" id="modal-evento">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="modal-evento-title">Nuevo Evento</h3>
+            <button class="modal-close" data-close-modal>&times;</button>
+          </div>
+          <form id="form-evento" class="modal-form">
+            <input type="hidden" id="evento-id"/>
+            <div class="form-group">
+              <label for="evento-nombre">Nombre del Evento *</label>
+              <input type="text" id="evento-nombre" required placeholder="Ej: Feria Primavera 2026"/>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="evento-fecha">Fecha *</label>
+                <input type="date" id="evento-fecha" required/>
+              </div>
+              <div class="form-group">
+                <label for="evento-hora">Hora</label>
+                <input type="time" id="evento-hora"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="evento-ubicacion">Ubicación</label>
+              <input type="text" id="evento-ubicacion" placeholder="Ej: Plaza Central, Santiago"/>
+            </div>
+            <div class="form-group">
+              <label for="evento-descripcion">Descripción</label>
+              <textarea id="evento-descripcion" rows="3" placeholder="Detalles del evento..."></textarea>
+            </div>
+            <div class="modal-actions">
+              <button type="button" class="btn btn-outline" data-close-modal>Cancelar</button>
+              <button type="submit" class="btn btn-primary"><span class="btn-text">Guardar</span><span class="btn-spinner hidden"></span></button>
+            </div>
+          </form>
+        </div>
+      </dialog>
+
+      <!-- Modal: Reabrir Evento -->
+      <dialog class="admin-modal" id="modal-reabrir">
+        <div class="modal-content" style="max-width: 500px;">
+          <div class="modal-header">
+            <h3>🔓 Reabrir Evento</h3>
+            <button class="modal-close" data-close-modal>&times;</button>
+          </div>
+          <form id="form-reabrir" class="modal-form">
+            <input type="hidden" id="reabrir-evento-id"/>
+            <div class="form-group">
+              <label>Evento</label>
+              <input type="text" id="reabrir-evento-nombre" readonly style="background:var(--color-muted-bg);"/>
+            </div>
+            <div class="form-group">
+              <label for="reabrir-motivo">Motivo de Reapertura *</label>
+              <textarea id="reabrir-motivo" rows="3" placeholder="Explicar detalladamente por qué se reabre el evento..." required></textarea>
+              <small style="color: var(--color-muted);">Esta justificación quedará registrada en el historial de auditoría.</small>
+            </div>
+            <div class="form-group">
+              <label for="reabrir-nota-adicional">Nota adicional (opcional)</label>
+              <input type="text" id="reabrir-nota-adicional" placeholder="Ej: Se detectó venta no registrada"/>
+            </div>
+            <div class="modal-actions">
+              <button type="button" class="btn btn-outline" data-close-modal>Cancelar</button>
+              <button type="submit" class="btn btn-warning">⚠️ Reabrir Evento</button>
+            </div>
+          </form>
+        </div>
+      </dialog>
+    </div>
   </div>
-
-  <!-- ============================================================ -->
-  <!-- MODALES -->
-  <!-- ============================================================ -->
-
-  <!-- Modal: Evento -->
-  <dialog class="admin-modal" id="modal-evento">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="modal-evento-title">Nuevo Evento</h3>
-        <button class="modal-close" data-close-modal>&times;</button>
-      </div>
-      <form id="form-evento" class="modal-form">
-        <input type="hidden" id="evento-id"/>
-        <div class="form-group">
-          <label for="evento-nombre">Nombre del Evento *</label>
-          <input type="text" id="evento-nombre" required placeholder="Ej: Feria Primavera 2026"/>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="evento-fecha">Fecha *</label>
-            <input type="date" id="evento-fecha" required/>
-          </div>
-          <div class="form-group">
-            <label for="evento-hora">Hora</label>
-            <input type="time" id="evento-hora"/>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="evento-ubicacion">Ubicación</label>
-          <input type="text" id="evento-ubicacion" placeholder="Ej: Plaza Central, Santiago"/>
-        </div>
-        <div class="form-group">
-          <label for="evento-descripcion">Descripción</label>
-          <textarea id="evento-descripcion" rows="3" placeholder="Detalles del evento..."></textarea>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn btn-outline" data-close-modal>Cancelar</button>
-          <button type="submit" class="btn btn-primary"><span class="btn-text">Guardar</span><span class="btn-spinner hidden"></span></button>
-        </div>
-      </form>
-    </div>
-  </dialog>
-
-  <!-- Modal: Reabrir Evento (con justificación obligatoria) -->
-  <dialog class="admin-modal" id="modal-reabrir">
-    <div class="modal-content" style="max-width: 500px;">
-      <div class="modal-header">
-        <h3>🔓 Reabrir Evento</h3>
-        <button class="modal-close" data-close-modal>&times;</button>
-      </div>
-      <form id="form-reabrir" class="modal-form">
-        <input type="hidden" id="reabrir-evento-id"/>
-        <div class="form-group">
-          <label>Evento</label>
-          <input type="text" id="reabrir-evento-nombre" readonly style="background:var(--color-muted-bg);"/>
-        </div>
-        <div class="form-group">
-          <label for="reabrir-motivo">Motivo de Reapertura *</label>
-          <textarea id="reabrir-motivo" rows="3" placeholder="Explicar detalladamente por qué se reabre el evento..." required></textarea>
-          <small style="color: var(--color-muted);">Esta justificación quedará registrada en el historial de auditoría.</small>
-        </div>
-        <div class="form-group">
-          <label for="reabrir-nota-adicional">Nota adicional (opcional)</label>
-          <input type="text" id="reabrir-nota-adicional" placeholder="Ej: Se detectó venta no registrada"/>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn btn-outline" data-close-modal>Cancelar</button>
-          <button type="submit" class="btn btn-warning">⚠️ Reabrir Evento</button>
-        </div>
-      </form>
-    </div>
-  </dialog>
 
   <!-- ============================================================ -->
   <!-- STYLES -->
   <!-- ============================================================ -->
   <style is:global>
+    /* ── Reset / Base ── */
     body { background-color: #f0ebe0; }
 
+    /* ── Loading ── */
     .admin-loading {
       position: fixed; inset: 0;
       display: flex; flex-direction: column;
@@ -493,8 +410,8 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
       z-index: 9999;
     }
     .admin-loading.hidden { display: none; }
-    .admin-loading p { color: var(--feria-tierra); font-size: var(--text-sm); }
 
+    /* ── Login ── */
     .admin-login {
       min-height: 100vh;
       display: flex; align-items: center; justify-content: center;
@@ -534,6 +451,7 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
     .admin-login__hint a { color: var(--feria-tierra); text-decoration: none; }
     .admin-login__hint a:hover { color: var(--feria-bosque); }
 
+    /* ── Dashboard ── */
     .admin-dashboard { display: flex; min-height: 100vh; }
     .admin-dashboard.hidden { display: none; }
 
@@ -562,7 +480,7 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
       color: var(--feria-crema); text-decoration: none;
       font-family: var(--font-serif); font-weight: 700; font-size: var(--text-lg);
     }
-    .admin-sidebar__brand:hover { color: var(--feria-salvia); text-decoration: none; }
+    .admin-sidebar__brand:hover { color: var(--feria-salvia); }
     .admin-sidebar__close {
       background: none; border: none; color: var(--feria-crema);
       font-size: 1.5rem; cursor: pointer; padding: var(--space-1); line-height: 1;
@@ -710,7 +628,6 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
       background: var(--color-card-bg);
     }
 
-    /* Tabs internos del histórico */
     .tabs-bar.historico-tabs {
       display: flex;
       gap: 0;
@@ -742,7 +659,6 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
 
     .tab-panel { display: block; }
     .tab-panel.hidden { display: none; }
-
     .panel-header { margin-bottom: var(--space-4); }
 
     .table-wrapper {
@@ -820,20 +736,43 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
     }
     .btn-warning:hover { background: #d97706; }
 
+    /* ── MODALES ── */
+    .modal-container {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      pointer-events: none;
+    }
+    .modal-container.hidden { display: none; }
+    .modal-container:not(.hidden) { pointer-events: auto; }
+
     .admin-modal {
-      position: fixed; inset: 0;
+      position: fixed;
+      inset: 0;
       background: rgba(17, 42, 70, 0.5);
-      display: flex; align-items: center; justify-content: center;
-      padding: var(--space-4); z-index: 300; border: none;
-      width: 100%; height: 100%; max-width: none; max-height: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-4);
+      z-index: 301;
+      border: none;
+      width: 100%;
+      height: 100%;
+      max-width: none;
+      max-height: none;
+      pointer-events: auto;
     }
     .admin-modal[open] { display: flex; }
     .admin-modal::backdrop { background: rgba(17, 42, 70, 0.5); }
     .modal-content {
       background: var(--color-card-bg);
       border-radius: var(--radius-xl);
-      width: 100%; max-width: 520px; max-height: 90vh;
-      overflow-y: auto; box-shadow: var(--shadow-xl);
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-xl);
+      pointer-events: auto;
     }
     .modal-header {
       display: flex; align-items: center; justify-content: space-between;
@@ -884,28 +823,20 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
   </style>
 
   <!-- ============================================================ -->
-  <!-- SCRIPTS -->
+  <!-- SCRIPTS (Simplificados y Corregidos) -->
   <!-- ============================================================ -->
   <script is:inline define:vars={{ API_BASE }}>
     (function() {
       'use strict';
 
-      // ============================================================
-      // STATE
-      // ============================================================
+      // ── State ──
       const state = {
         token: localStorage.getItem('feriaapp_token'),
         user: null,
-        currentView: 'resumen',
-        eventos: [],
-        ventas: [],
-        bodega: [],
-        auditoria: []
+        currentView: 'resumen'
       };
 
-      // ============================================================
-      // DOM HELPERS
-      // ============================================================
+      // ── DOM Helpers ──
       const $ = (s) => document.querySelector(s);
       const $$ = (s) => document.querySelectorAll(s);
 
@@ -914,13 +845,6 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
         month: 'short',
         year: 'numeric'
       }) : '--';
-
-      const fmtTime = (d) => d ? new Date(d).toLocaleTimeString('es-CL', {
-        hour: '2-digit',
-        minute: '2-digit'
-      }) : '--';
-
-      const fmtDateTime = (d) => d ? `${fmtDate(d)} ${fmtTime(d)}` : '--';
 
       const fmtCur = (a) => a != null ? '$' + Number(a).toLocaleString('es-CL') : '--';
 
@@ -931,9 +855,7 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
         return div.innerHTML;
       };
 
-      // ============================================================
-      // API
-      // ============================================================
+      // ── API ──
       const api = async (ep, opts = {}) => {
         try {
           const res = await fetch(API_BASE + ep, {
@@ -945,41 +867,32 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
             ...opts,
             body: opts.body && typeof opts.body === 'object' ? JSON.stringify(opts.body) : opts.body
           });
-
           const data = await res.json().catch(() => null);
-
           if (res.status === 401) {
-            // Token inválido o expirado
             localStorage.removeItem('feriaapp_token');
             localStorage.removeItem('feriaapp_user');
             showLogin();
             return null;
           }
-
           return { ok: res.ok, status: res.status, data };
         } catch (e) {
           console.error('API Error:', e);
-          updateApiStatus(false);
           return { ok: false, error: e.message };
         }
       };
 
-      // ============================================================
-      // AUTH
-      // ============================================================
-      const login = async (em, pw) => {
+      // ── Auth ──
+      // ── Auth ──
+      const login = async (username, password) => {
         const r = await api('/auth/login', {
           method: 'POST',
-          body: { email: em, password: pw }
+          body: { username, password }  // ✅ username, no email
         });
-
         if (r?.ok && r.data?.token) {
           state.token = r.data.token;
-          state.user = r.data.user || { nombre: 'Admin' };
+          state.user = r.data.user || { nombre: username };
           localStorage.setItem('feriaapp_token', r.data.token);
-          if (r.data.user) {
-            localStorage.setItem('feriaapp_user', JSON.stringify(r.data.user));
-          }
+          if (r.data.user) localStorage.setItem('feriaapp_user', JSON.stringify(r.data.user));
           return true;
         }
         return false;
@@ -996,14 +909,9 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
       const checkAuth = () => {
         const t = localStorage.getItem('feriaapp_token');
         const u = localStorage.getItem('feriaapp_user');
-
         if (t) {
           state.token = t;
-          try {
-            state.user = JSON.parse(u);
-          } catch (e) {
-            state.user = { nombre: 'Admin' };
-          }
+          try { state.user = JSON.parse(u); } catch (e) { state.user = { nombre: 'Admin' }; }
           return true;
         }
         return false;
@@ -1013,12 +921,18 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
         $('#admin-loading')?.classList.add('hidden');
         $('#admin-login')?.classList.remove('hidden');
         $('#admin-dashboard')?.classList.add('hidden');
+        // Ocultar modales
+        const container = document.getElementById('modal-container');
+        if (container) container.classList.add('hidden');
       };
 
       const showDashboard = () => {
         $('#admin-loading')?.classList.add('hidden');
         $('#admin-login')?.classList.add('hidden');
         $('#admin-dashboard')?.classList.remove('hidden');
+        // Mostrar contenedor de modales
+        const container = document.getElementById('modal-container');
+        if (container) container.classList.remove('hidden');
 
         const u = state.user;
         if (u) {
@@ -1027,63 +941,25 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
           if (ne) ne.textContent = u.nombre || u.email || 'Admin';
           if (ae) ae.textContent = (u.nombre?.[0] || u.email?.[0] || 'A').toUpperCase();
         }
-
         loadDashboardData();
       };
 
-      // ============================================================
-      // API STATUS
-      // ============================================================
-      const updateApiStatus = (on) => {
-        const el = $('#api-status');
-        const dot = el?.querySelector('.status-dot');
-        if (el && dot) {
-          dot.classList.toggle('offline', !on);
-          const textNode = el.childNodes[2];
-          if (textNode) textNode.textContent = on ? ' Conectado' : ' Offline';
-        }
-      };
-
-      // ============================================================
-      // NAVIGATION
-      // ============================================================
+      // ── Navigation ──
       const switchView = (vn) => {
         state.currentView = vn;
-
-        $$('.nav-item').forEach(b => {
-          b.classList.toggle('active', b.dataset.view === vn);
-        });
-
-        const titles = {
-          resumen: 'Resumen',
-          eventos: 'Eventos',
-          ventas: 'Ventas',
-          bodega: 'Bodega',
-          historico: 'Histórico y Auditoría'
-        };
+        $$('.nav-item').forEach(b => b.classList.toggle('active', b.dataset.view === vn));
+        const titles = { resumen: 'Resumen', eventos: 'Eventos', ventas: 'Ventas', bodega: 'Bodega', historico: 'Histórico y Auditoría' };
         const te = $('#view-title');
         if (te) te.textContent = titles[vn] || vn;
-
         $$('.admin-view').forEach(v => v.classList.add('hidden'));
         const ve = $(`#view-${vn}`);
         if (ve) ve.classList.remove('hidden');
-
-        // Cargar datos según vista
         if (vn === 'eventos') loadEventos();
         if (vn === 'ventas') loadVentas();
         if (vn === 'bodega') loadBodega();
         if (vn === 'historico') loadHistorico();
         if (vn === 'resumen') loadDashboardData();
-
         closeSidebar();
-      };
-
-      // ============================================================
-      // SIDEBAR
-      // ============================================================
-      const openSidebar = () => {
-        $('#admin-sidebar')?.classList.add('is-open');
-        $('#admin-overlay')?.classList.add('is-visible');
       };
 
       const closeSidebar = () => {
@@ -1091,73 +967,39 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
         $('#admin-overlay')?.classList.remove('is-visible');
       };
 
-      // ============================================================
-      // DASHBOARD DATA
-      // ============================================================
+      // ── Carga de datos (simplificada) ──
       const loadDashboardData = async () => {
-        const h = await api('/health');
-        updateApiStatus(h?.ok);
-        await Promise.all([
-          loadEventosStats(),
-          loadBodegaStats(),
-          loadVentasStats()
-        ]);
+        // Solo para mostrar stats básicos
+        try {
+          const [ev, prod, ventas] = await Promise.all([
+            api('/eventos?estado=activo&limit=1'),
+            api('/productos/bodega?limit=1'),
+            api('/ventas?limit=1')
+          ]);
+          const elEventos = $('#stat-eventos');
+          const elBodega = $('#stat-bodega');
+          const elVentas = $('#stat-ventas');
+          if (elEventos) elEventos.textContent = ev?.data?.length || 0;
+          if (elBodega) elBodega.textContent = prod?.data?.length || 0;
+          if (elVentas) elVentas.textContent = ventas?.data?.length || 0;
+        } catch (e) {
+          console.warn('Error loading stats:', e);
+        }
+        // Cargar resumenes
         loadResumenEventos();
         loadResumenVentas();
       };
 
-      const loadEventosStats = async () => {
-        const r = await api('/eventos?estado=activo&limit=1');
-        if (r?.ok) {
-          const total = r.data?.total || r.data?.length || 0;
-          const el = $('#stat-eventos');
-          if (el) el.textContent = total;
-        }
-      };
-
-      const loadBodegaStats = async () => {
-        const r = await api('/productos/bodega?limit=1');
-        if (r?.ok) {
-          const total = r.data?.total || r.data?.length || 0;
-          const el = $('#stat-bodega');
-          if (el) el.textContent = total;
-        }
-      };
-
-      const loadVentasStats = async () => {
-        const now = new Date();
-        const fd = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-        const r = await api(`/ventas?fecha_desde=${fd}&limit=1`);
-
-        if (r?.ok) {
-          const data = r.data?.items || r.data || [];
-          const totalVentas = r.data?.total || data.length || 0;
-          const ingresos = data.reduce((s, v) => s + (v.total_venta || v.total || 0), 0);
-
-          const elVentas = $('#stat-ventas');
-          const elIngresos = $('#stat-ingresos');
-
-          if (elVentas) elVentas.textContent = totalVentas;
-          if (elIngresos) elIngresos.textContent = fmtCur(ingresos);
-        }
-      };
-
-      // ============================================================
-      // RESUMEN - Eventos Recientes
-      // ============================================================
       const loadResumenEventos = async () => {
         const r = await api('/eventos?limit=5');
         const tb = $('#resumen-eventos-tbody');
         if (!tb) return;
-
         if (!r?.ok || !r.data?.length) {
           tb.innerHTML = '<tr><td colspan="4" class="empty-state">No hay eventos registrados</td></tr>';
           return;
         }
-
         tb.innerHTML = r.data.slice(0, 5).map(e => {
-          const ec = e.estado === 'activo' ? 'badge-success' :
-            e.estado === 'cerrado' ? 'badge-danger' : 'badge-warning';
+          const ec = e.estado === 'activo' ? 'badge-success' : e.estado === 'cerrado' ? 'badge-danger' : 'badge-warning';
           const total = e.total_recaudado || e.total_confirmado || e.total_calculado || 0;
           return `<tr>
             <td><strong>${escapeHtml(e.nombre || e.lugar || 'Sin nombre')}</strong></td>
@@ -1168,19 +1010,14 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
         }).join('');
       };
 
-      // ============================================================
-      // RESUMEN - Ventas Recientes
-      // ============================================================
       const loadResumenVentas = async () => {
         const r = await api('/ventas?limit=5');
         const tb = $('#resumen-ventas-tbody');
         if (!tb) return;
-
         if (!r?.ok || !r.data?.length) {
           tb.innerHTML = '<tr><td colspan="4" class="empty-state">No hay ventas registradas</td></tr>';
           return;
         }
-
         tb.innerHTML = r.data.slice(0, 5).map(v => {
           const total = v.total_venta || v.total || 0;
           const items = v.lineas?.length || v.cantidad_items || 0;
@@ -1195,39 +1032,22 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
         }).join('');
       };
 
-      // ============================================================
-      // EVENTOS
-      // ============================================================
+      // ── Eventos ──
       const loadEventos = async () => {
         const r = await api('/eventos?limit=100');
         const tb = $('#eventos-tbody');
         if (!tb) return;
-
-        state.eventos = r?.data || [];
-
-        if (!state.eventos.length) {
+        const eventos = r?.data || [];
+        if (!eventos.length) {
           tb.innerHTML = '<tr><td colspan="6" class="empty-state">No hay eventos. Crea el primero.</td></tr>';
           return;
         }
-
-        renderEventos(state.eventos);
-      };
-
-      const renderEventos = (evs) => {
-        const tb = $('#eventos-tbody');
-        if (!tb) return;
-
-        tb.innerHTML = evs.map(e => {
-          const ec = e.estado === 'activo' ? 'badge-success' :
-            e.estado === 'cerrado' ? 'badge-danger' : 'badge-warning';
+        tb.innerHTML = eventos.map(e => {
+          const ec = e.estado === 'activo' ? 'badge-success' : e.estado === 'cerrado' ? 'badge-danger' : 'badge-warning';
           const pc = e.estado === 'activo';
           const total = e.total_recaudado || e.total_confirmado || e.total_calculado || 0;
-          const canal = e.canal_venta_nombre ?
-            `<br><small style="color:var(--color-muted)">${escapeHtml(e.canal_venta_nombre)}</small>` :
-            '';
-
           return `<tr data-id="${e.id}">
-            <td><strong>${escapeHtml(e.nombre || e.lugar || 'Sin nombre')}</strong>${canal}</td>
+            <td><strong>${escapeHtml(e.nombre || e.lugar || 'Sin nombre')}</strong></td>
             <td>${fmtDate(e.fecha)}</td>
             <td>${escapeHtml(e.lugar || '--')}</td>
             <td><span class="badge ${ec}">${e.estado || 'N/A'}</span></td>
@@ -1235,26 +1055,24 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
             <td>
               <div style="display:flex;gap:4px;flex-wrap:wrap;">
                 ${pc ? `<button class="btn btn-sm btn-danger" data-action="cerrar" data-id="${e.id}">Cerrar</button>` : ''}
-                ${e.estado === 'cerrado' ? `<button class="btn btn-sm btn-warning" data-action="reabrir" data-id="${e.id}" data-nombre="${escapeHtml(e.nombre || e.lugar || 'Evento')}">🔓 Reabrir</button>` : ''}
+                ${e.estado === 'cerrado' ? `<button class="btn btn-sm btn-warning btn-reabrir" data-id="${e.id}" data-nombre="${escapeHtml(e.nombre || e.lugar || 'Evento')}">🔓 Reabrir</button>` : ''}
                 <button class="btn btn-sm btn-outline" data-action="editar" data-id="${e.id}">Editar</button>
               </div>
             </td>
           </tr>`;
         }).join('');
 
-        // Event listeners para acciones
+        // Event listeners
         tb.querySelectorAll('[data-action="cerrar"]').forEach(btn => {
           btn.addEventListener('click', () => cerrarEvento(btn.dataset.id));
         });
-
-        tb.querySelectorAll('[data-action="reabrir"]').forEach(btn => {
+        tb.querySelectorAll('.btn-reabrir').forEach(btn => {
           btn.addEventListener('click', () => {
             document.getElementById('reabrir-evento-id').value = btn.dataset.id;
             document.getElementById('reabrir-evento-nombre').value = btn.dataset.nombre;
-            document.getElementById('modal-reabrir').showModal();
+            document.getElementById('modal-reabrir')?.showModal();
           });
         });
-
         tb.querySelectorAll('[data-action="editar"]').forEach(btn => {
           btn.addEventListener('click', () => {
             alert('✏️ Editar evento #' + btn.dataset.id + ' - En desarrollo');
@@ -1262,26 +1080,16 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
         });
       };
 
-      // ============================================================
-      // CERRAR EVENTO
-      // ============================================================
       const cerrarEvento = async (id) => {
         const total = prompt('Ingresa el total confirmado para el cierre:');
         if (total === null) return;
         const totalNum = Number(total);
-        if (isNaN(totalNum) || totalNum < 0) {
-          alert('Debes ingresar un número válido.');
-          return;
-        }
-
-        const confirmar = confirm(`¿Cerrar evento #${id} con total $${totalNum.toLocaleString()}?`);
-        if (!confirmar) return;
-
+        if (isNaN(totalNum) || totalNum < 0) return alert('Debes ingresar un número válido.');
+        if (!confirm(`¿Cerrar evento #${id} con total $${totalNum.toLocaleString()}?`)) return;
         const r = await api(`/eventos/${id}/cerrar`, {
           method: 'POST',
           body: { total_confirmado: totalNum }
         });
-
         if (r?.ok) {
           alert('✅ Evento cerrado exitosamente');
           loadEventos();
@@ -1291,139 +1099,51 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
         }
       };
 
-      // ============================================================
-      // REABRIR EVENTO (con justificación)
-      // ============================================================
-      document.getElementById('form-reabrir')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const id = document.getElementById('reabrir-evento-id').value;
-        const motivo = document.getElementById('reabrir-motivo').value.trim();
-        const notaAdicional = document.getElementById('reabrir-nota-adicional').value.trim();
-
-        if (!motivo) {
-          alert('⚠️ Debes escribir el motivo de la reapertura.');
-          return;
-        }
-
-        if (!confirm(`¿Estás seguro de reabrir el evento #${id}?\n\nMotivo: ${motivo}`)) return;
-
-        const payload = {
-          nota_reapertura: motivo,
-          nota_adicional: notaAdicional || null
-        };
-
-        const r = await api(`/eventos/${id}/reabrir`, {
-          method: 'POST',
-          body: payload
-        });
-
-        if (r?.ok) {
-          alert('✅ Evento reabierto exitosamente. La justificación ha sido registrada en auditoría.');
-          document.getElementById('modal-reabrir').close();
-          document.getElementById('form-reabrir').reset();
-          loadEventos();
-          loadDashboardData();
-          // Si estamos en histórico, recargar auditoría
-          if (state.currentView === 'historico') loadAuditoria();
-        } else {
-          alert('❌ Error al reabrir: ' + (r?.data?.detail || 'Error desconocido'));
-        }
-      });
-
-      // ============================================================
-      // VENTAS
-      // ============================================================
+      // ── Ventas ──
       const loadVentas = async () => {
-        const desde = document.getElementById('filtro-fecha-desde')?.value || '';
-        const hasta = document.getElementById('filtro-fecha-hasta')?.value || '';
-        const eventoId = document.getElementById('filtro-evento-venta')?.value || '';
-
-        let url = '/ventas?limit=100';
-        if (desde) url += `&fecha_desde=${desde}`;
-        if (hasta) url += `&fecha_hasta=${hasta}`;
-        if (eventoId) url += `&evento_id=${eventoId}`;
-
-        const r = await api(url);
+        const r = await api('/ventas?limit=100');
         const tb = $('#ventas-tbody');
         if (!tb) return;
-
-        state.ventas = r?.data || [];
-
-        // Cargar eventos en filtro
-        if (!document.querySelector('#filtro-evento-venta option[value=""]')) {
-          const evRes = await api('/eventos?limit=100');
-          if (evRes?.ok) {
-            const select = document.getElementById('filtro-evento-venta');
-            select.innerHTML = '<option value="">Todos los eventos</option>' +
-              evRes.data.map(e => `<option value="${e.id}">${escapeHtml(e.nombre || e.lugar || 'Sin nombre')}</option>`).join('');
-          }
-        }
-
-        if (!state.ventas.length) {
+        const ventas = r?.data || [];
+        if (!ventas.length) {
           tb.innerHTML = '<tr><td colspan="7" class="empty-state">No hay ventas registradas</td></tr>';
           return;
         }
-
-        renderVentas(state.ventas);
-      };
-
-      const renderVentas = (vs) => {
-        const tb = $('#ventas-tbody');
-        if (!tb) return;
-
-        tb.innerHTML = vs.map(v => {
+        tb.innerHTML = ventas.map(v => {
           const total = v.total_venta || v.total || 0;
           const items = v.lineas?.length || v.cantidad_items || 0;
-          const metodo = v.forma_pago || '--';
-          const evento = v.evento_lugar || v.evento_nombre || 'N/A';
           const fecha = v.timestamp_local || v.fecha;
-
           return `<tr>
             <td><code>#${v.id}</code></td>
             <td>${fmtDate(fecha)}</td>
-            <td>${escapeHtml(evento)}</td>
+            <td>${escapeHtml(v.evento_lugar || v.evento_nombre || 'N/A')}</td>
             <td>${items}</td>
             <td><strong>${fmtCur(total)}</strong></td>
-            <td>${escapeHtml(metodo)}</td>
+            <td>${escapeHtml(v.forma_pago || '--')}</td>
             <td><small>${escapeHtml((v.notas || '').substring(0, 30))}</small></td>
           </tr>`;
         }).join('');
       };
 
-      // ============================================================
-      // BODEGA
-      // ============================================================
+      // ── Bodega ──
       const loadBodega = async () => {
         const r = await api('/productos/bodega?limit=200');
         const tb = $('#bodega-tbody');
         if (!tb) return;
-
-        state.bodega = r?.data || [];
-
-        if (!state.bodega.length) {
+        const productos = r?.data || [];
+        if (!productos.length) {
           tb.innerHTML = '<tr><td colspan="7" class="empty-state">Bodega vacía. Agrega productos.</td></tr>';
           return;
         }
-
-        renderBodega(state.bodega);
-      };
-
-      const renderBodega = (ps) => {
-        const tb = $('#bodega-tbody');
-        if (!tb) return;
-
-        tb.innerHTML = ps.map(p => {
+        tb.innerHTML = productos.map(p => {
           const stock = p.stock || 0;
           const sb = stock < 5 && stock > 0;
           const ag = stock === 0;
           const ec = ag ? 'badge-danger' : sb ? 'badge-warning' : 'badge-success';
           const et = ag ? 'Agotado' : sb ? 'Stock Bajo' : 'Disponible';
-
           const historia = p.historia_origen ?
             `<br><small style="color: var(--feria-gold); font-style: italic;">📖 ${escapeHtml(p.historia_origen.substring(0, 40))}${p.historia_origen.length > 40 ? '...' : ''}</small>` :
             '';
-
           return `<tr data-id="${p.id}">
             <td><code style="font-size:0.75rem;">${escapeHtml(p.sku || p.codigo_barras || p.id)}</code></td>
             <td>
@@ -1446,16 +1166,11 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
             window.location.href = `/?editar=${btn.dataset.id}`;
           });
         });
-
         tb.querySelectorAll('[data-action="ver-historia"]').forEach(btn => {
           btn.addEventListener('click', () => {
-            const p = state.bodega.find(item => String(item.id) === btn.dataset.id);
+            const p = productos.find(item => String(item.id) === btn.dataset.id);
             if (p?.historia_origen) {
-              alert(`📖 Historia de "${p.nombre}"
-━━━━━━━━━━━━━━━━━━━━━━━
-${p.historia_origen}
-${p.historia_ubicacion ? `\n📍 ${p.historia_ubicacion}` : ''}
-${p.historia_motivo ? `\n💡 Motivo: ${p.historia_motivo}` : ''}`);
+              alert(`📖 Historia de "${p.nombre}"\n━━━━━━━━━━━━━━━━━━━━━━━\n${p.historia_origen}${p.historia_ubicacion ? `\n📍 ${p.historia_ubicacion}` : ''}${p.historia_motivo ? `\n💡 Motivo: ${p.historia_motivo}` : ''}`);
             } else {
               alert('Esta prenda aún no tiene historia registrada.');
             }
@@ -1463,60 +1178,31 @@ ${p.historia_motivo ? `\n💡 Motivo: ${p.historia_motivo}` : ''}`);
         });
       };
 
-      // ============================================================
-      // HISTÓRICO / AUDITORÍA
-      // ============================================================
+      // ── Histórico ──
       const loadHistorico = () => {
-        // Activar pestaña por defecto
-        document.querySelectorAll('.historico-tabs .tab-btn').forEach(btn => {
-          btn.classList.remove('active');
+        document.querySelectorAll('.historico-tabs .tab-btn').forEach((btn, i) => {
+          btn.classList.toggle('active', i === 0);
         });
-        const firstTab = document.querySelector('.historico-tabs .tab-btn');
-        if (firstTab) firstTab.classList.add('active');
-
-        document.querySelectorAll('.historico-tabs + .tab-panel').forEach(p => p.classList.add('hidden'));
-        const firstPanel = document.querySelector('.historico-tabs + .tab-panel');
-        if (firstPanel) firstPanel.classList.remove('hidden');
-
+        document.querySelectorAll('.historico-tabs + .tab-panel, .historico-tabs ~ .tab-panel').forEach((p, i) => {
+          p.classList.toggle('hidden', i !== 0);
+        });
         loadAuditoria();
         loadEventosCerrados();
-        loadFlujos();
       };
 
-      // ============================================================
-      // AUDITORÍA
-      // ============================================================
       const loadAuditoria = async () => {
         const tb = document.getElementById('historico-auditoria-tbody');
         if (!tb) return;
-
-        const texto = document.getElementById('filtro-auditoria')?.value || '';
-        const tipo = document.getElementById('filtro-auditoria-tipo')?.value || '';
-        const desde = document.getElementById('filtro-auditoria-desde')?.value || '';
-        const hasta = document.getElementById('filtro-auditoria-hasta')?.value || '';
-
-        let url = `/auditoria?limit=100`;
-        if (texto) url += `&search=${encodeURIComponent(texto)}`;
-        if (tipo) url += `&tipo=${tipo}`;
-        if (desde) url += `&fecha_desde=${desde}`;
-        if (hasta) url += `&fecha_hasta=${hasta}`;
-
-        const r = await api(url);
+        const r = await api('/auditoria?limit=100');
         if (!r?.ok || !r.data?.length) {
           tb.innerHTML = '<tr><td colspan="5" class="empty-state">No hay registros de auditoría</td></tr>';
           return;
         }
-
-        state.auditoria = r.data;
-
         tb.innerHTML = r.data.map(a => {
           const tipoLabel = a.tipo || '--';
-          const tipoClass = tipoLabel === 'reabrir' ? 'badge-warning' :
-            tipoLabel === 'modificar' ? 'badge-info' :
-            tipoLabel === 'stock' ? 'badge-danger' : 'badge-success';
-
+          const tipoClass = tipoLabel === 'reabrir' ? 'badge-warning' : tipoLabel === 'modificar' ? 'badge-info' : tipoLabel === 'stock' ? 'badge-danger' : 'badge-success';
           return `<tr>
-            <td>${fmtDateTime(a.created_at || a.fecha_cambio)}</td>
+            <td>${fmtDate(a.created_at || a.fecha_cambio)}</td>
             <td><span class="badge ${tipoClass}">${tipoLabel}</span></td>
             <td>${escapeHtml(a.usuario_nombre || a.operador || '--')}</td>
             <td>${escapeHtml(a.detalle || a.campo_afectado || '--')}</td>
@@ -1525,28 +1211,14 @@ ${p.historia_motivo ? `\n💡 Motivo: ${p.historia_motivo}` : ''}`);
         }).join('');
       };
 
-      // ============================================================
-      // EVENTOS CERRADOS
-      // ============================================================
       const loadEventosCerrados = async () => {
         const tb = document.getElementById('historico-eventos-tbody');
         if (!tb) return;
-
-        const texto = document.getElementById('filtro-eventos-cerrados')?.value || '';
-        const desde = document.getElementById('filtro-eventos-desde')?.value || '';
-        const hasta = document.getElementById('filtro-eventos-hasta')?.value || '';
-
-        let url = `/eventos?estado=cerrado&limit=100`;
-        if (texto) url += `&search=${encodeURIComponent(texto)}`;
-        if (desde) url += `&fecha_desde=${desde}`;
-        if (hasta) url += `&fecha_hasta=${hasta}`;
-
-        const r = await api(url);
+        const r = await api('/eventos?estado=cerrado&limit=100');
         if (!r?.ok || !r.data?.length) {
           tb.innerHTML = '<tr><td colspan="7" class="empty-state">No hay eventos cerrados</td></tr>';
           return;
         }
-
         tb.innerHTML = r.data.map(e => {
           const diff = (e.diferencia || 0) !== 0;
           return `<tr data-id="${e.id}">
@@ -1557,147 +1229,50 @@ ${p.historia_motivo ? `\n💡 Motivo: ${p.historia_motivo}` : ''}`);
             <td class="${diff ? 'text-danger' : ''}">${fmtCur(e.diferencia || 0)}</td>
             <td>${fmtDate(e.fecha_cierre)}</td>
             <td>
-              <button class="btn btn-sm btn-warning btn-reabrir" data-id="${e.id}" data-nombre="${escapeHtml(e.nombre || e.lugar || 'Evento')}">🔓 Reabrir</button>
+              <button class="btn btn-sm btn-warning btn-reabrir-cerrado" data-id="${e.id}" data-nombre="${escapeHtml(e.nombre || e.lugar || 'Evento')}">🔓 Reabrir</button>
             </td>
           </tr>`;
         }).join('');
 
-        tb.querySelectorAll('.btn-reabrir').forEach(btn => {
+        tb.querySelectorAll('.btn-reabrir-cerrado').forEach(btn => {
           btn.addEventListener('click', () => {
             document.getElementById('reabrir-evento-id').value = btn.dataset.id;
             document.getElementById('reabrir-evento-nombre').value = btn.dataset.nombre;
-            document.getElementById('modal-reabrir').showModal();
+            document.getElementById('modal-reabrir')?.showModal();
           });
         });
       };
 
-      // ============================================================
-      // FLUJOS DE PRODUCTOS
-      // ============================================================
-      const loadFlujos = async () => {
-        const tb = document.getElementById('historico-flujos-tbody');
-        if (!tb) return;
+      // ── Formulario Reabrir ──
+      document.getElementById('form-reabrir')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('reabrir-evento-id').value;
+        const motivo = document.getElementById('reabrir-motivo').value.trim();
+        const notaAdicional = document.getElementById('reabrir-nota-adicional').value.trim();
 
-        const texto = document.getElementById('filtro-flujos')?.value || '';
-        const tipo = document.getElementById('filtro-flujo-tipo')?.value || '';
-        const estado = document.getElementById('filtro-flujo-estado')?.value || '';
+        if (!motivo) return alert('⚠️ Debes escribir el motivo de la reapertura.');
+        if (!confirm(`¿Estás seguro de reabrir el evento #${id}?\n\nMotivo: ${motivo}`)) return;
 
-        let url = `/productos/flujos?limit=100`;
-        if (texto) url += `&search=${encodeURIComponent(texto)}`;
-        if (tipo) url += `&tipo=${tipo}`;
-        if (estado) url += `&estado=${estado}`;
-
-        const r = await api(url);
-        if (!r?.ok || !r.data?.length) {
-          tb.innerHTML = '<tr><td colspan="6" class="empty-state">No hay flujos registrados</td></tr>';
-          return;
-        }
-
-        tb.innerHTML = r.data.map(f => {
-          const tipoLabel = f.tipo || '--';
-          const tipoClass = tipoLabel === 'boutique' ? 'badge-success' :
-            tipoLabel === 'feria' ? 'badge-warning' :
-            tipoLabel === 'donacion' ? 'badge-info' : 'badge-danger';
-
-          return `<tr>
-            <td><strong>${escapeHtml(f.producto_nombre || 'Sin nombre')}</strong></td>
-            <td><span class="badge ${tipoClass}">${tipoLabel}</span></td>
-            <td>${fmtDate(f.fecha_movimiento || f.created_at)}</td>
-            <td>${escapeHtml(f.motivo || '--')}</td>
-            <td>${escapeHtml(f.evaluado_por || '--')}</td>
-            <td><small>${escapeHtml((f.historia_origen || '').substring(0, 60))}${(f.historia_origen || '').length > 60 ? '...' : ''}</small></td>
-          </tr>`;
-        }).join('');
-      };
-
-      // ============================================================
-      // FILTROS (eventos en tiempo real)
-      // ============================================================
-      // Eventos
-      document.getElementById('filtro-eventos')?.addEventListener('input', (e) => {
-        const q = e.target.value.toLowerCase();
-        const filtered = state.eventos.filter(ev =>
-          (ev.nombre || '').toLowerCase().includes(q) ||
-          (ev.lugar || '').toLowerCase().includes(q)
-        );
-        renderEventos(filtered);
-      });
-
-      document.getElementById('filtro-estado')?.addEventListener('change', (e) => {
-        const st = e.target.value;
-        const filtered = st ? state.eventos.filter(ev => ev.estado === st) : state.eventos;
-        renderEventos(filtered);
-      });
-
-      // Ventas
-      document.getElementById('filtro-fecha-desde')?.addEventListener('change', loadVentas);
-      document.getElementById('filtro-fecha-hasta')?.addEventListener('change', loadVentas);
-      document.getElementById('filtro-evento-venta')?.addEventListener('change', loadVentas);
-
-      // Bodega
-      document.getElementById('filtro-bodega')?.addEventListener('input', (e) => {
-        const q = e.target.value.toLowerCase();
-        const filtered = state.bodega.filter(p =>
-          (p.nombre || '').toLowerCase().includes(q) ||
-          (p.sku || '').toLowerCase().includes(q)
-        );
-        renderBodega(filtered);
-      });
-
-      document.getElementById('filtro-stock')?.addEventListener('change', (e) => {
-        const t = e.target.value;
-        let filtered = state.bodega;
-        if (t === 'bajo') filtered = state.bodega.filter(p => (p.stock || 0) < 5 && (p.stock || 0) > 0);
-        if (t === 'agotado') filtered = state.bodega.filter(p => (p.stock || 0) === 0);
-        renderBodega(filtered);
-      });
-
-      // Auditoría
-      document.getElementById('filtro-auditoria')?.addEventListener('input', loadAuditoria);
-      document.getElementById('filtro-auditoria-tipo')?.addEventListener('change', loadAuditoria);
-      document.getElementById('filtro-auditoria-desde')?.addEventListener('change', loadAuditoria);
-      document.getElementById('filtro-auditoria-hasta')?.addEventListener('change', loadAuditoria);
-
-      // Eventos cerrados
-      document.getElementById('filtro-eventos-cerrados')?.addEventListener('input', loadEventosCerrados);
-      document.getElementById('filtro-eventos-desde')?.addEventListener('change', loadEventosCerrados);
-      document.getElementById('filtro-eventos-hasta')?.addEventListener('change', loadEventosCerrados);
-
-      // Flujos
-      document.getElementById('filtro-flujos')?.addEventListener('input', loadFlujos);
-      document.getElementById('filtro-flujo-tipo')?.addEventListener('change', loadFlujos);
-      document.getElementById('filtro-flujo-estado')?.addEventListener('change', loadFlujos);
-
-      // ============================================================
-      // BOTONES Y ACCIONES GLOBALES
-      // ============================================================
-      // Navegación desde botones de resumen
-      document.querySelectorAll('[data-action="ver-eventos"], [data-action="ver-ventas"]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const target = btn.dataset.action === 'ver-eventos' ? 'eventos' : 'ventas';
-          switchView(target);
+        const r = await api(`/eventos/${id}/reabrir`, {
+          method: 'POST',
+          body: { nota_reapertura: motivo, nota_adicional: notaAdicional || null }
         });
+
+        if (r?.ok) {
+          alert('✅ Evento reabierto exitosamente. La justificación ha sido registrada en auditoría.');
+          document.getElementById('modal-reabrir')?.close();
+          document.getElementById('form-reabrir')?.reset();
+          loadEventos();
+          loadDashboardData();
+          if (state.currentView === 'historico') loadAuditoria();
+        } else {
+          alert('❌ Error al reabrir: ' + (r?.data?.detail || 'Error desconocido'));
+        }
       });
 
-      // Nuevo evento
-      document.getElementById('btn-nuevo-evento')?.addEventListener('click', () => {
-        document.getElementById('modal-evento-title').textContent = 'Nuevo Evento';
-        document.getElementById('evento-id').value = '';
-        document.getElementById('form-evento').reset();
-        document.getElementById('modal-evento').showModal();
-      });
-
-      // Formulario de evento
+      // ── Formulario Nuevo Evento ──
       document.getElementById('form-evento')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-
-        const btn = e.target.querySelector('button[type="submit"]');
-        const txt = btn?.querySelector('.btn-text');
-        const sp = btn?.querySelector('.btn-spinner');
-        if (txt) txt.classList.add('hidden');
-        if (sp) sp.classList.remove('hidden');
-        if (btn) btn.disabled = true;
-
         const payload = {
           nombre: document.getElementById('evento-nombre').value,
           fecha: document.getElementById('evento-fecha').value,
@@ -1705,18 +1280,9 @@ ${p.historia_motivo ? `\n💡 Motivo: ${p.historia_motivo}` : ''}`);
           ubicacion: document.getElementById('evento-ubicacion').value || null,
           descripcion: document.getElementById('evento-descripcion').value || null
         };
-
-        const r = await api('/eventos', {
-          method: 'POST',
-          body: payload
-        });
-
-        if (txt) txt.classList.remove('hidden');
-        if (sp) sp.classList.add('hidden');
-        if (btn) btn.disabled = false;
-
+        const r = await api('/eventos', { method: 'POST', body: payload });
         if (r?.ok) {
-          document.getElementById('modal-evento').close();
+          document.getElementById('modal-evento')?.close();
           loadEventos();
           loadDashboardData();
           alert('✅ Evento creado exitosamente');
@@ -1725,7 +1291,7 @@ ${p.historia_motivo ? `\n💡 Motivo: ${p.historia_motivo}` : ''}`);
         }
       });
 
-      // Cerrar modales
+      // ── Cerrar modales ──
       document.querySelectorAll('[data-close-modal]').forEach(btn => {
         btn.addEventListener('click', () => {
           const modal = btn.closest('dialog');
@@ -1733,101 +1299,89 @@ ${p.historia_motivo ? `\n💡 Motivo: ${p.historia_motivo}` : ''}`);
         });
       });
 
-      // Cerrar modal al hacer click fuera
       document.querySelectorAll('.admin-modal').forEach(modal => {
         modal.addEventListener('click', (e) => {
           if (e.target === modal) modal.close();
         });
       });
 
-      // ============================================================
-      // TABS DEL HISTÓRICO
-      // ============================================================
-      document.querySelectorAll('.historico-tabs .tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.historico-tabs .tab-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-
-          document.querySelectorAll('.historico-tabs + .tab-panel, .historico-tabs ~ .tab-panel').forEach(p => p.classList.add('hidden'));
-
-          const panelId = 'panel-' + btn.dataset.tab;
-          const panel = document.getElementById(panelId);
-          if (panel) panel.classList.remove('hidden');
-
-          // Cargar datos según pestaña
-          const tab = btn.dataset.tab;
-          if (tab === 'auditoria') loadAuditoria();
-          if (tab === 'eventos-cerrados') loadEventosCerrados();
-          if (tab === 'flujos') loadFlujos();
-        });
+      // ── Eventos de UI ──
+      document.getElementById('btn-nuevo-evento')?.addEventListener('click', () => {
+        document.getElementById('modal-evento-title').textContent = 'Nuevo Evento';
+        document.getElementById('evento-id').value = '';
+        document.getElementById('form-evento').reset();
+        document.getElementById('modal-evento')?.showModal();
       });
 
-      // ============================================================
-      // REFRESH AUDITORÍA
-      // ============================================================
-      document.getElementById('btn-refresh-auditoria')?.addEventListener('click', () => {
-        loadAuditoria();
-        loadEventosCerrados();
-        loadFlujos();
-      });
-
-      // ============================================================
-      // EXPORTAR AUDITORÍA
-      // ============================================================
-      document.getElementById('btn-exportar-auditoria')?.addEventListener('click', () => {
-        if (!state.auditoria || !state.auditoria.length) {
-          alert('No hay datos para exportar.');
-          return;
-        }
-
-        let csv = 'Fecha,Tipo,Usuario,Detalle,Justificación\n';
-        state.auditoria.forEach(a => {
-          const fecha = fmtDateTime(a.created_at || a.fecha_cambio);
-          const tipo = a.tipo || '--';
-          const usuario = a.usuario_nombre || a.operador || '--';
-          const detalle = (a.detalle || a.campo_afectado || '--').replace(/,/g, ';');
-          const justificacion = (a.justificacion || a.motivo || '--').replace(/,/g, ';');
-          csv += `${fecha},${tipo},${usuario},${detalle},${justificacion}\n`;
-        });
-
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `auditoria_${new Date().toISOString().split('T')[0]}.csv`;
-        link.click();
-        URL.revokeObjectURL(link.href);
-      });
-
-      // ============================================================
-      // NUEVO PRODUCTO
-      // ============================================================
       document.getElementById('btn-nuevo-producto')?.addEventListener('click', () => {
         window.location.href = '/?nuevo=1';
       });
 
-      // ============================================================
-      // NUEVA VENTA
-      // ============================================================
       document.getElementById('btn-nueva-venta')?.addEventListener('click', () => {
         alert('🧾 Registrar nueva venta - En desarrollo');
-        // Aquí iría el modal/formulario de venta
       });
 
-      // ============================================================
-      // LOGOUT
-      // ============================================================
       document.getElementById('btn-logout')?.addEventListener('click', logout);
-
-      // ============================================================
-      // SIDEBAR TOGGLE
-      // ============================================================
-      document.getElementById('sidebar-toggle')?.addEventListener('click', openSidebar);
+      document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
+        $('#admin-sidebar')?.classList.add('is-open');
+        $('#admin-overlay')?.classList.add('is-visible');
+      });
       document.getElementById('sidebar-close')?.addEventListener('click', closeSidebar);
       document.getElementById('admin-overlay')?.addEventListener('click', closeSidebar);
 
-      // ============================================================
-      // NAVEGACIÓN POR TECLADO (Escape para cerrar sidebar)
-      // ============================================================
+      document.querySelectorAll('[data-action="ver-eventos"], [data-action="ver-ventas"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          switchView(btn.dataset.action === 'ver-eventos' ? 'eventos' : 'ventas');
+        });
+      });
+
+      document.querySelectorAll('.historico-tabs .tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.historico-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          document.querySelectorAll('.historico-tabs + .tab-panel, .historico-tabs ~ .tab-panel').forEach(p => p.classList.add('hidden'));
+          const panelId = 'panel-' + btn.dataset.tab;
+          const panel = document.getElementById(panelId);
+          if (panel) panel.classList.remove('hidden');
+          if (btn.dataset.tab === 'auditoria') loadAuditoria();
+          if (btn.dataset.tab === 'eventos-cerrados') loadEventosCerrados();
+        });
+      });
+
+      document.getElementById('btn-refresh-auditoria')?.addEventListener('click', () => {
+        loadAuditoria();
+        loadEventosCerrados();
+      });
+
+      document.getElementById('filtro-eventos')?.addEventListener('input', () => {
+        const q = document.getElementById('filtro-eventos').value.toLowerCase();
+        const rows = document.querySelectorAll('#eventos-tbody tr');
+        rows.forEach(row => {
+          const text = row.textContent.toLowerCase();
+          row.style.display = text.includes(q) ? '' : 'none';
+        });
+      });
+
+      document.getElementById('filtro-estado')?.addEventListener('change', () => {
+        const estado = document.getElementById('filtro-estado').value;
+        const rows = document.querySelectorAll('#eventos-tbody tr');
+        rows.forEach(row => {
+          const estadoCell = row.querySelector('td:nth-child(4) .badge');
+          if (!estado) { row.style.display = ''; return; }
+          row.style.display = estadoCell?.textContent.trim().toLowerCase() === estado ? '' : 'none';
+        });
+      });
+
+      document.getElementById('filtro-bodega')?.addEventListener('input', () => {
+        const q = document.getElementById('filtro-bodega').value.toLowerCase();
+        const rows = document.querySelectorAll('#bodega-tbody tr');
+        rows.forEach(row => {
+          const text = row.textContent.toLowerCase();
+          row.style.display = text.includes(q) ? '' : 'none';
+        });
+      });
+
+      // ── Keyboard shortcuts ──
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
           closeSidebar();
@@ -1835,9 +1389,7 @@ ${p.historia_motivo ? `\n💡 Motivo: ${p.historia_motivo}` : ''}`);
         }
       });
 
-      // ============================================================
-      // INICIALIZACIÓN
-      // ============================================================
+      // ── Init ──
       const init = () => {
         if (checkAuth()) {
           showDashboard();
@@ -1845,25 +1397,13 @@ ${p.historia_motivo ? `\n💡 Motivo: ${p.historia_motivo}` : ''}`);
           showLogin();
         }
 
-        // Login
         document.getElementById('login-form')?.addEventListener('submit', async (e) => {
           e.preventDefault();
           document.getElementById('login-error')?.classList.add('hidden');
 
-          const btn = e.target.querySelector('button[type="submit"]');
-          const txt = btn?.querySelector('.btn-text');
-          const sp = btn?.querySelector('.btn-spinner');
-          if (txt) txt.classList.add('hidden');
-          if (sp) sp.classList.remove('hidden');
-          if (btn) btn.disabled = true;
-
-          const email = document.getElementById('login-email').value.trim();
+          const username = document.getElementById('login-username').value.trim();
           const password = document.getElementById('login-password').value;
-          const ok = await login(email, password);
-
-          if (txt) txt.classList.remove('hidden');
-          if (sp) sp.classList.add('hidden');
-          if (btn) btn.disabled = false;
+          const ok = await login(username, password);
 
           if (ok) {
             showDashboard();
@@ -1876,13 +1416,11 @@ ${p.historia_motivo ? `\n💡 Motivo: ${p.historia_motivo}` : ''}`);
           }
         });
 
-        // Navegación
         $$('.nav-item').forEach(b => {
           b.addEventListener('click', () => switchView(b.dataset.view));
         });
       };
 
-      // Iniciar cuando el DOM esté listo
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
       } else {

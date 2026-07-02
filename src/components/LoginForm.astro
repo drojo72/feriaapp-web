@@ -152,14 +152,20 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
     };
 
     const login = async (em, pw) => {
-      const r = await api('/auth/login', { method: 'POST', body: { email: em, password: pw } });
-      if (r?.ok && r.data?.token) {
-        localStorage.setItem('feriaapp_token', r.data.token);
-        if (r.data.user?.nombre) localStorage.setItem('feriaapp_user', JSON.stringify(r.data.user));
+    const r = await api('/auth/login', {
+        method: 'POST',
+        body: { email: em, password: pw }
+    });
+
+    if (r?.ok && r.data?.access_token) {
+        localStorage.setItem('feriaapp_token', r.data.access_token);
+        if (r.data.user) {
+            localStorage.setItem('feriaapp_user', JSON.stringify(r.data.user));
+        }
         return true;
-      }
-      return false;
-    };
+    }
+    return false;
+};
 
     const form = document.getElementById('login-form');
     form?.addEventListener('submit', async (e) => {
