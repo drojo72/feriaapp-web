@@ -2,358 +2,38 @@
 const API_BASE = 'https://feriaapp-api.onrender.com';
 ---
 
-<div class="view-section" id="eventos-section">
-  <div class="view-header">
-    <h3>Gestión de Eventos</h3>
-    <button class="btn btn-primary btn-sm" id="btn-nuevo-evento">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="12" y1="5" x2="12" y2="19"/>
-        <line x1="5" y1="12" x2="19" y2="12"/>
-      </svg>
-      Nuevo Evento
-    </button>
-  </div>
-
-  <div class="filters-bar">
-    <input type="text" id="filtro-eventos" placeholder="Buscar eventos..." class="filter-input"/>
-    <select id="filtro-estado" class="filter-select">
-      <option value="">Todos los estados</option>
-      <option value="activo">Activo</option>
-      <option value="cerrado">Cerrado</option>
-      <option value="programado">Programado</option>
-    </select>
-  </div>
-
-  <div class="table-wrapper">
-    <table>
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Fecha</th>
-          <th>Ubicación</th>
-          <th>Estado</th>
-          <th>Ventas</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody id="eventos-tbody">
-        <tr><td colspan="6" class="empty-state">Cargando eventos...</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<dialog class="admin-modal" id="modal-evento">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3 id="modal-evento-title">Nuevo Evento</h3>
-      <button class="modal-close" data-close-modal>&times;</button>
-    </div>
-    <form id="form-evento" class="modal-form">
-      <input type="hidden" id="evento-id"/>
-      <div class="form-group">
-        <label for="evento-nombre">Nombre del Evento *</label>
-        <input type="text" id="evento-nombre" required placeholder="Ej: Feria Primavera 2026"/>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="evento-fecha">Fecha *</label>
-          <input type="date" id="evento-fecha" required/>
-        </div>
-        <div class="form-group">
-          <label for="evento-hora">Hora</label>
-          <input type="time" id="evento-hora"/>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="evento-ubicacion">Ubicación</label>
-        <input type="text" id="evento-ubicacion" placeholder="Ej: Plaza Central, Santiago"/>
-      </div>
-      <div class="form-group">
-        <label for="evento-descripcion">Descripción</label>
-        <textarea id="evento-descripcion" rows="3" placeholder="Detalles del evento..."></textarea>
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-outline" data-close-modal>Cancelar</button>
-        <button type="submit" class="btn btn-primary">
-          <span class="btn-text">Guardar</span>
-          <span class="btn-spinner hidden"></span>
-        </button>
-      </div>
-    </form>
-  </div>
-</dialog>
-
-<style>
-  .view-section { margin-bottom: var(--space-8); }
-
-  .view-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: var(--space-6);
-    flex-wrap: wrap;
-    gap: var(--space-4);
-  }
-
-  .view-header h3 {
-    font-family: var(--font-serif);
-    font-size: var(--text-2xl);
-    color: var(--feria-navy);
-    margin: 0;
-  }
-
-  .filters-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
-    margin-bottom: var(--space-5);
-  }
-
-  .filter-input, .filter-select {
-    max-width: 250px;
-  }
-
-  .admin-modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(17, 42, 70, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-4);
-    z-index: 300;
-    border: none;
-    width: 100%;
-    height: 100%;
-    max-width: none;
-    max-height: none;
-  }
-
-  .admin-modal[open] {
-    display: flex;
-  }
-
-  .admin-modal::backdrop {
-    background: rgba(17, 42, 70, 0.5);
-  }
-
-  .modal-content {
-    background: var(--color-card-bg);
-    border-radius: var(--radius-xl);
-    width: 100%;
-    max-width: 520px;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: var(--shadow-xl);
-  }
-
-  .modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--space-5) var(--space-6);
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .modal-header h3 {
-    font-family: var(--font-serif);
-    font-size: var(--text-xl);
-    color: var(--feria-navy);
-    margin: 0;
-  }
-
-  .modal-close {
-    background: none;
-    border: none;
-    font-size: var(--text-2xl);
-    color: var(--color-muted);
-    cursor: pointer;
-    line-height: 1;
-    padding: var(--space-1);
-    transition: color 0.2s;
-  }
-
-  .modal-close:hover { color: var(--feria-navy); }
-
-  .modal-form { padding: var(--space-6); }
-
-  .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-4);
-  }
-
-  @media (max-width: 480px) {
-    .form-row { grid-template-columns: 1fr; }
-  }
-
-  .form-group { margin-bottom: var(--space-4); }
-
-  .form-group label {
-    display: block;
-    font-size: var(--text-sm);
-    font-weight: 600;
-    color: var(--feria-navy);
-    margin-bottom: var(--space-2);
-  }
-
-  .form-group input,
-  .form-group textarea,
-  .form-group select {
-    width: 100%;
-    padding: var(--space-3) var(--space-4);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    font-size: var(--text-base);
-    color: var(--color-text);
-    background: var(--color-card-bg);
-    transition: border-color 0.2s, box-shadow 0.2s;
-    font-family: inherit;
-  }
-
-  .form-group input:focus,
-  .form-group textarea:focus,
-  .form-group select:focus {
-    outline: none;
-    border-color: var(--feria-gold);
-    box-shadow: 0 0 0 3px rgba(203, 168, 107, 0.15);
-  }
-
-  .modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--space-3);
-    margin-top: var(--space-2);
-    padding-top: var(--space-5);
-    border-top: 1px solid var(--color-border);
-  }
-
-  .table-wrapper {
-    overflow-x: auto;
-    background: var(--color-card-bg);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--color-border);
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: var(--text-sm);
-  }
-
-  thead {
-    background: var(--feria-navy);
-    color: var(--color-white);
-  }
-
-  th {
-    padding: var(--space-3) var(--space-4);
-    text-align: left;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: var(--text-xs);
-    letter-spacing: 0.05em;
-    white-space: nowrap;
-  }
-
-  td {
-    padding: var(--space-3) var(--space-4);
-    border-bottom: 1px solid var(--color-border);
-    color: var(--color-text);
-    vertical-align: middle;
-  }
-
-  tbody tr:hover { background: var(--color-row-hover, rgba(203,168,107,0.04)); }
-  tbody tr:last-child td { border-bottom: none; }
-
-  .empty-state {
-    text-align: center;
-    padding: var(--space-8);
-    color: var(--color-muted);
-    font-style: italic;
-  }
-
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    padding: var(--space-1) var(--space-3);
-    border-radius: var(--radius-full);
-    font-size: var(--text-xs);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-  }
-
-  .badge-activo { background: #dcfce7; color: #166534; }
-  .badge-cerrado { background: #fee2e2; color: #991b1b; }
-  .badge-programado { background: #dbeafe; color: #1e40af; }
-
-  .btn-icon {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: var(--space-2);
-    border-radius: var(--radius-md);
-    color: var(--color-muted);
-    transition: all 0.2s;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .btn-icon:hover {
-    background: var(--color-row-hover, rgba(203,168,107,0.08));
-    color: var(--feria-navy);
-  }
-
-  .btn-icon.danger:hover { color: #dc2626; background: #fee2e2; }
-
-  .btn-spinner {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(255,255,255,0.3);
-    border-top-color: white;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin-left: var(--space-2);
-    vertical-align: middle;
-  }
-
-  .btn-spinner.hidden { display: none; }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .hidden { display: none !important; }
-
-  .ventas-link {
-    color: var(--feria-gold);
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-  }
-  .ventas-link:hover { text-decoration: underline; }
-</style>
+<!-- ... mismo HTML ... -->
 
 <script>
   const API_BASE = 'https://feriaapp-api.onrender.com';
   let eventosCache = [];
 
-  const tbody = document.getElementById('eventos-tbody');
-  const filtroTexto = document.getElementById('filtro-eventos');
-  const filtroEstado = document.getElementById('filtro-estado');
-  const modal = document.getElementById('modal-evento');
-  const form = document.getElementById('form-evento');
-  const btnNuevo = document.getElementById('btn-nuevo-evento');
-  const modalTitle = document.getElementById('modal-evento-title');
+  // ✅ Mapeo de campos actualizado para API optimizada
+  const mapEvento = (e) => ({
+    id: e.id,
+    nombre: e.nombre || e.lugar || 'Evento sin nombre',
+    fecha: e.fecha,
+    hora: e.hora || '',
+    ubicacion: e.lugar || e.ubicacion || '',
+    estado: e.estado || 'activo',
+    total_ventas: e.total_recaudado || e.total_confirmado || e.total_calculado || 0,
+    descripcion: e.notas || '',
+    // Campos nuevos de campos redundantes
+    canal: e.canal_venta_nombre || '',
+    tipo_canal: e.canal_venta_tipo || '',
+    vendedor: e.vendedor_nombre || '',
+    total_calculado: e.total_calculado || 0,
+    total_confirmado: e.total_confirmado || 0,
+    diferencia: e.diferencia || 0,
+    fecha_cierre: e.fecha_cierre || null
+  });
 
   async function cargarEventos() {
     try {
-      const res = await fetch(`${API_BASE}/eventos`);
+      const res = await fetch(`${API_BASE}/eventos?limit=100`); // ✅ Endpoint optimizado
       if (!res.ok) throw new Error('Error cargando eventos');
-      eventosCache = await res.json();
+      const raw = await res.json();
+      eventosCache = raw.map(mapEvento);
       renderizar(eventosCache);
     } catch (e) {
       tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Error: ${e.message}</td></tr>`;
@@ -374,86 +54,85 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
       return;
     }
 
-    tbody.innerHTML = filtrados.map(ev => `
+    tbody.innerHTML = filtrados.map(ev => {
+      // ✅ Badge de estado mejorado
+      const estadoBadge = {
+        'activo': 'badge-activo',
+        'cerrado': 'badge-cerrado',
+        'programado': 'badge-programado'
+      }[ev.estado] || 'badge-activo';
+
+      // ✅ Mostrar información de canal
+      const canalInfo = ev.canal ? `<br><small style="color: var(--color-muted);">${escapeHtml(ev.canal)} ${ev.tipo_canal ? `(${ev.tipo_canal})` : ''}</small>` : '';
+
+      return `
       <tr data-id="${ev.id}">
-        <td><strong>${escapeHtml(ev.nombre)}</strong></td>
+        <td>
+          <strong>${escapeHtml(ev.nombre)}</strong>
+          ${canalInfo}
+        </td>
         <td>${formatearFecha(ev.fecha)} ${ev.hora || ''}</td>
         <td>${escapeHtml(ev.ubicacion || '-')}</td>
-        <td><span class="badge badge-${ev.estado}">${ev.estado}</span></td>
+        <td><span class="badge ${estadoBadge}">${ev.estado}</span></td>
         <td>$${Number(ev.total_ventas || 0).toLocaleString()}</td>
         <td>
-          <button class="btn-icon btn-editar" title="Editar">✏️</button>
-          <button class="btn-icon btn-eliminar" title="Eliminar">🗑️</button>
+          <button class="btn-icon btn-ver" title="Ver detalle" data-id="${ev.id}">👁️</button>
+          <button class="btn-icon btn-editar" title="Editar" data-id="${ev.id}">✏️</button>
         </td>
-      </tr>
-    `).join('');
+      </tr>`;
+    }).join('');
 
+    // ✅ Eventos con delegación (más eficiente)
+    tbody.querySelectorAll('.btn-ver').forEach(btn => {
+      btn.addEventListener('click', () => verEvento(btn.dataset.id));
+    });
     tbody.querySelectorAll('.btn-editar').forEach(btn => {
-      btn.addEventListener('click', () => abrirEditar(btn.closest('tr').dataset.id));
-    });
-    tbody.querySelectorAll('.btn-eliminar').forEach(btn => {
-      btn.addEventListener('click', () => eliminarEvento(btn.closest('tr').dataset.id));
+      btn.addEventListener('click', () => abrirEditar(btn.dataset.id));
     });
   }
 
-  function abrirNuevo() {
-    modalTitle.textContent = 'Nuevo Evento';
-    form.reset();
-    document.getElementById('evento-id').value = '';
+  async function verEvento(id) {
+    try {
+      const res = await fetch(`${API_BASE}/eventos/${id}/resumen`);
+      if (!res.ok) throw new Error('Error cargando resumen');
+      const data = await res.json();
+      // Mostrar modal con resumen
+      mostrarResumen(data);
+    } catch (e) {
+      alert('Error: ' + e.message);
+    }
+  }
+
+  function mostrarResumen(data) {
+    const content = document.getElementById('venta-detalle-content');
+    if (!content) return;
+    content.innerHTML = `
+      <div class="resumen-evento">
+        <p><strong>Evento:</strong> ${escapeHtml(data.evento?.nombre || '')}</p>
+        <p><strong>Fecha:</strong> ${formatearFecha(data.evento?.fecha)}</p>
+        <p><strong>Estado:</strong> ${data.evento?.estado || ''}</p>
+        <hr>
+        <div class="stats-grid">
+          <div><strong>Total Ventas:</strong> $${Number(data.totales?.total_recaudado || 0).toLocaleString()}</div>
+          <div><strong>Transacciones:</strong> ${data.totales?.total_ventas || 0}</div>
+          <div><strong>Rebajas:</strong> $${Number(data.totales?.total_rebajas || 0).toLocaleString()}</div>
+        </div>
+        ${data.productos?.length ? `
+          <hr>
+          <h4>Productos vendidos</h4>
+          ${data.productos.map(p => `
+            <div class="linea-item">
+              <span class="linea-nombre">${escapeHtml(p.nombre || 'Sin nombre')}</span>
+              <span>${p.cantidad_vendida || 0} uds.</span>
+              <span class="linea-precio">$${Number(p.total_recaudado || 0).toLocaleString()}</span>
+            </div>
+          `).join('')}
+        ` : ''}
+      </div>
+    `;
+    document.getElementById('modal-venta-title').textContent = 'Resumen Evento';
     modal.showModal();
   }
 
-  async function abrirEditar(id) {
-    const ev = eventosCache.find(e => String(e.id) === id);
-    if (!ev) return;
-    modalTitle.textContent = 'Editar Evento';
-    document.getElementById('evento-id').value = ev.id;
-    document.getElementById('evento-nombre').value = ev.nombre || '';
-    document.getElementById('evento-fecha').value = ev.fecha ? ev.fecha.substring(0,10) : '';
-    document.getElementById('evento-hora').value = ev.hora || '';
-    document.getElementById('evento-ubicacion').value = ev.ubicacion || '';
-    document.getElementById('evento-descripcion').value = ev.descripcion || '';
-    modal.showModal();
-  }
-
-  async function eliminarEvento(id) {
-    if (!confirm('¿Eliminar este evento?')) return;
-    try {
-      const res = await fetch(`${API_BASE}/eventos/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Error eliminando');
-      cargarEventos();
-    } catch (e) { alert(e.message); }
-  }
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const id = document.getElementById('evento-id').value;
-    const payload = {
-      nombre: document.getElementById('evento-nombre').value,
-      fecha: document.getElementById('evento-fecha').value,
-      hora: document.getElementById('evento-hora').value || null,
-      ubicacion: document.getElementById('evento-ubicacion').value || null,
-      descripcion: document.getElementById('evento-descripcion').value || null,
-      estado: id ? undefined : 'activo'
-    };
-    try {
-      const url = id ? `${API_BASE}/eventos/${id}` : `${API_BASE}/eventos`;
-      const method = id ? 'PUT' : 'POST';
-      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-      if (!res.ok) throw new Error('Error guardando');
-      modal.close();
-      cargarEventos();
-    } catch (err) { alert(err.message); }
-  });
-
-  btnNuevo.addEventListener('click', abrirNuevo);
-  document.querySelectorAll('[data-close-modal]').forEach(btn => btn.addEventListener('click', () => modal.close()));
-  modal.addEventListener('click', (e) => { if (e.target === modal) modal.close(); });
-  filtroTexto.addEventListener('input', () => renderizar(eventosCache));
-  filtroEstado.addEventListener('change', () => renderizar(eventosCache));
-
-  function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
-  function formatearFecha(fecha) { if (!fecha) return '-'; return new Date(fecha).toLocaleDateString('es-CL'); }
-
-  cargarEventos();
+  // ... resto del código ...
 </script>

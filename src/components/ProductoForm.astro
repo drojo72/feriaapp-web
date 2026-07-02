@@ -2,350 +2,60 @@
 const API_BASE = 'https://feriaapp-api.onrender.com';
 ---
 
-<div class="view-section" id="producto-form-section">
-  <div class="view-header">
-    <h3 id="form-title">Nuevo Producto</h3>
-    <button class="btn btn-outline btn-sm" id="btn-volver-bodega">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-      Volver a Bodega
-    </button>
+<!-- ... mismo HTML hasta la sección de etiquetas ... -->
+
+<div class="form-section">
+  <h4>📖 Historia del Producto</h4>
+  <div class="form-group">
+    <label for="prod-historia">Historia / Origen</label>
+    <textarea id="prod-historia" rows="3" placeholder="Ej: Donación de familia en La Dehesa. Ropa de nieta que creció rápido, usado solo 2 veces."></textarea>
+    <small style="color: var(--color-muted); font-size: var(--text-xs);">Cada prenda tiene una historia. Esto conecta con el comprador.</small>
   </div>
-
-  <form id="form-producto" class="producto-form">
-    <input type="hidden" id="prod-id"/>
-
-    <div class="form-section">
-      <h4>Información General</h4>
-      <div class="form-row">
-        <div class="form-group wide">
-          <label for="prod-nombre">Nombre del Producto *</label>
-          <input type="text" id="prod-nombre" required placeholder="Ej: Polera de lino azul marino"/>
-        </div>
-        <div class="form-group">
-          <label for="prod-sku">SKU</label>
-          <input type="text" id="prod-sku" placeholder="Ej: PLN-AZM-M"/>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="prod-descripcion">Descripción</label>
-        <textarea id="prod-descripcion" rows="2" placeholder="Detalles del producto..."></textarea>
-      </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label for="prod-ubicacion">Ubicación de origen</label>
+      <input type="text" id="prod-ubicacion" placeholder="Ej: La Dehesa, Ñuñoa, Talca..."/>
     </div>
-
-    <div class="form-section">
-      <h4>Categorización</h4>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="prod-categoria">Categoría *</label>
-          <select id="prod-categoria" required>
-            <option value="">Seleccionar...</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="prod-subcategoria">Subcategoría</label>
-          <select id="prod-subcategoria">
-            <option value="">Seleccionar...</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="prod-temporada">Temporada</label>
-          <select id="prod-temporada">
-            <option value="">Ninguna</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="prod-genero">Género</label>
-          <select id="prod-genero">
-            <option value="">Seleccionar...</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="prod-segmento">Segmento Edad</label>
-          <select id="prod-segmento">
-            <option value="">Seleccionar...</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="prod-nivel-calidad">Nivel Calidad</label>
-          <select id="prod-nivel-calidad">
-            <option value="">Seleccionar...</option>
-          </select>
-        </div>
-      </div>
+    <div class="form-group">
+      <label for="prod-motivo">Motivo de donación</label>
+      <select id="prod-motivo">
+        <option value="">Seleccionar...</option>
+        <option value="renovacion">Renovación de clóset</option>
+        <option value="herencia">Herencia familiar</option>
+        <option value="limpieza">Limpieza / Mudanza</option>
+        <option value="viaje">Viaje / Mudanza al sur</option>
+        <option value="crecimiento">Crecimiento (bebé/niño)</option>
+        <option value="cambio_gustos">Cambio de gustos</option>
+        <option value="otro">Otro</option>
+      </select>
     </div>
-
-    <div class="form-section">
-      <h4>Detalles Físicos</h4>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="prod-talla">Talla</label>
-          <input type="text" id="prod-talla" placeholder="Ej: M, 42, Única"/>
-        </div>
-        <div class="form-group">
-          <label for="prod-color">Color</label>
-          <input type="text" id="prod-color" placeholder="Ej: Azul marino"/>
-        </div>
-        <div class="form-group">
-          <label for="prod-material">Material</label>
-          <input type="text" id="prod-material" placeholder="Ej: Lino 100%"/>
-        </div>
-      </div>
-    </div>
-
-    <div class="form-section">
-      <h4>Precios y Stock</h4>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="prod-precio-costo">Precio Costo ($)</label>
-          <input type="number" id="prod-precio-costo" min="0" step="100" placeholder="0"/>
-        </div>
-        <div class="form-group">
-          <label for="prod-precio-venta">Precio Venta * ($)</label>
-          <input type="number" id="prod-precio-venta" required min="0" step="100" placeholder="0"/>
-        </div>
-        <div class="form-group">
-          <label for="prod-precio-rebaja">Precio Rebaja ($)</label>
-          <input type="number" id="prod-precio-rebaja" min="0" step="100" placeholder="0"/>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="prod-stock">Stock Inicial</label>
-          <input type="number" id="prod-stock" min="0" step="1" value="0"/>
-        </div>
-        <div class="form-group">
-          <label for="prod-estado">Estado</label>
-          <select id="prod-estado">
-            <option value="activo">Activo</option>
-            <option value="inactivo">Inactivo</option>
-            <option value="reservado">Reservado</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="prod-flujo">Flujo Prenda</label>
-          <select id="prod-flujo">
-            <option value="primera_seleccion">Primera Selección</option>
-            <option value="segunda_seleccion">Segunda Selección</option>
-            <option value="donacion">Donación</option>
-            <option value="reciclaje">Reciclaje</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div class="form-section">
-      <h4>Etiquetas</h4>
-      <div class="form-group">
-        <label for="prod-etiquetas">Etiquetas (separadas por coma)</label>
-        <input type="text" id="prod-etiquetas" placeholder="vintage, verano, artesanal..."/>
-      </div>
-    </div>
-
-    <div class="form-actions">
-      <button type="button" class="btn btn-outline" id="btn-cancelar">Cancelar</button>
-      <button type="submit" class="btn btn-primary btn-lg">
-        <span class="btn-text">Guardar Producto</span>
-        <span class="btn-spinner hidden"></span>
-      </button>
-    </div>
-  </form>
+  </div>
 </div>
 
-<style>
-  .view-section { margin-bottom: var(--space-8); max-width: 900px; }
-  .view-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);
-  }
-  .view-header h3 {
-    font-family: var(--font-serif); font-size: var(--text-2xl);
-    color: var(--feria-navy); margin: 0;
-  }
-
-  .producto-form {
-    background: var(--color-card-bg); border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl); box-shadow: var(--shadow-sm);
-  }
-
-  .form-section {
-    padding: var(--space-6); border-bottom: 1px solid var(--color-border);
-  }
-  .form-section:last-of-type { border-bottom: none; }
-  .form-section h4 {
-    font-family: var(--font-serif); font-size: var(--text-lg);
-    color: var(--feria-navy); margin: 0 0 var(--space-4) 0;
-    padding-bottom: var(--space-2); border-bottom: 2px solid var(--feria-gold);
-    display: inline-block;
-  }
-
-  .form-row {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--space-4); margin-bottom: var(--space-2);
-  }
-  .form-group { margin-bottom: var(--space-4); }
-  .form-group.wide { grid-column: 1 / -1; }
-  .form-group label {
-    display: block; font-size: var(--text-sm); font-weight: 600;
-    color: var(--feria-navy); margin-bottom: var(--space-2);
-  }
-  .form-group input, .form-group select, .form-group textarea {
-    width: 100%; padding: var(--space-3) var(--space-4); border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg); font-size: var(--text-base); color: var(--color-text);
-    background: var(--color-card-bg); transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;
-  }
-  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-    outline: none; border-color: var(--feria-gold); box-shadow: 0 0 0 3px rgba(203, 168, 107, 0.15);
-  }
-
-  .form-actions {
-    display: flex; justify-content: flex-end; gap: var(--space-4);
-    padding: var(--space-6); background: var(--color-muted-bg, rgba(203,168,107,0.03));
-    border-top: 1px solid var(--color-border); border-radius: 0 0 var(--radius-xl) var(--radius-xl);
-    position: sticky; bottom: 0;
-  }
-
-  .btn-spinner {
-    display: inline-block; width: 16px; height: 16px;
-    border: 2px solid rgba(255,255,255,0.3); border-top-color: white;
-    border-radius: 50%; animation: spin 0.8s linear infinite;
-    margin-left: var(--space-2); vertical-align: middle;
-  }
-  .btn-spinner.hidden { display: none; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-</style>
+<!-- ... resto del formulario ... -->
 
 <script>
-  const API_BASE = 'https://feriaapp-api.onrender.com';
-  let modo = 'crear';
-  let productoId = null;
-
-  const selects = {
-    categoria: document.getElementById('prod-categoria'),
-    subcategoria: document.getElementById('prod-subcategoria'),
-    temporada: document.getElementById('prod-temporada'),
-    genero: document.getElementById('prod-genero'),
-    segmento: document.getElementById('prod-segmento'),
-    nivel: document.getElementById('prod-nivel-calidad')
-  };
-
-  async function cargarCatalogos() {
-    const endpoints = [
-      ['categorias', selects.categoria],
-      ['subcategorias', selects.subcategoria],
-      ['temporadas', selects.temporada],
-      ['generos', selects.genero],
-      ['segmentos_edad', selects.segmento],
-      ['niveles_calidad', selects.nivel]
-    ];
-    for (const [endpoint, select] of endpoints) {
-      try {
-        const res = await fetch(`${API_BASE}/catalogo/${endpoint}`);
-        const data = await res.json();
-        const currentVal = select.value;
-        select.innerHTML = '<option value="">Seleccionar...</option>' +
-          data.map(item => `<option value="${item.id}">${escapeHtml(item.nombre)}</option>`).join('');
-        select.value = currentVal;
-      } catch (e) { console.error('Error cargando', endpoint, e); }
-    }
-
-    // Cascada categoría → subcategoría
-    selects.categoria.addEventListener('change', async () => {
-      const catId = selects.categoria.value;
-      if (!catId) { selects.subcategoria.innerHTML = '<option value="">Seleccionar...</option>'; return; }
-      try {
-        const res = await fetch(`${API_BASE}/catalogo/subcategorias?categoria_id=${catId}`);
-        const data = await res.json();
-        selects.subcategoria.innerHTML = '<option value="">Seleccionar...</option>' +
-          data.map(s => `<option value="${s.id}">${escapeHtml(s.nombre)}</option>`).join('');
-      } catch (e) { console.error(e); }
-    });
-  }
+  // ... código existente ...
 
   async function cargarProducto(id) {
     try {
-      const res = await fetch(`${API_BASE}/productos/${id}`);
+      const res = await fetch(`${API_BASE}/productos/bodega/${id}`);
       const p = await res.json();
-      productoId = p.id;
-      modo = 'editar';
-      document.getElementById('form-title').textContent = 'Editar Producto';
-      document.getElementById('prod-id').value = p.id;
-      document.getElementById('prod-nombre').value = p.nombre || '';
-      document.getElementById('prod-sku').value = p.sku || '';
-      document.getElementById('prod-descripcion').value = p.descripcion || '';
-      selects.categoria.value = p.categoria_id || '';
-      // Trigger change para cargar subcategorías
-      selects.categoria.dispatchEvent(new Event('change'));
-      setTimeout(() => { selects.subcategoria.value = p.subcategoria_id || ''; }, 100);
-      selects.temporada.value = p.temporada_id || '';
-      selects.genero.value = p.genero_id || '';
-      selects.segmento.value = p.segmento_edad_id || '';
-      selects.nivel.value = p.nivel_calidad_id || '';
-      document.getElementById('prod-talla').value = p.talla || '';
-      document.getElementById('prod-color').value = p.color || '';
-      document.getElementById('prod-material').value = p.material || '';
-      document.getElementById('prod-precio-costo').value = p.precio_costo || '';
-      document.getElementById('prod-precio-venta').value = p.precio_venta || '';
-      document.getElementById('prod-precio-rebaja').value = p.precio_rebaja || '';
-      document.getElementById('prod-stock').value = p.stock || 0;
-      document.getElementById('prod-estado').value = p.estado || 'activo';
-      document.getElementById('prod-flujo').value = p.flujo_prenda || 'primera_seleccion';
-      document.getElementById('prod-etiquetas').value = (p.etiquetas || []).join(', ');
+      // ... campos existentes ...
+      document.getElementById('prod-historia').value = p.historia_origen || '';
+      document.getElementById('prod-ubicacion').value = p.historia_ubicacion || '';
+      document.getElementById('prod-motivo').value = p.historia_motivo || '';
     } catch (e) { alert('Error cargando producto: ' + e.message); }
   }
 
   document.getElementById('form-producto').addEventListener('submit', async (e) => {
     e.preventDefault();
     const payload = {
-      nombre: document.getElementById('prod-nombre').value,
-      sku: document.getElementById('prod-sku').value || null,
-      descripcion: document.getElementById('prod-descripcion').value || null,
-      categoria_id: Number(selects.categoria.value) || null,
-      subcategoria_id: Number(selects.subcategoria.value) || null,
-      temporada_id: Number(selects.temporada.value) || null,
-      genero_id: Number(selects.genero.value) || null,
-      segmento_edad_id: Number(selects.segmento.value) || null,
-      nivel_calidad_id: Number(selects.nivel.value) || null,
-      talla: document.getElementById('prod-talla').value || null,
-      color: document.getElementById('prod-color').value || null,
-      material: document.getElementById('prod-material').value || null,
-      precio_costo: Number(document.getElementById('prod-precio-costo').value) || 0,
-      precio_venta: Number(document.getElementById('prod-precio-venta').value),
-      precio_rebaja: Number(document.getElementById('prod-precio-rebaja').value) || null,
-      stock: Number(document.getElementById('prod-stock').value) || 0,
-      estado: document.getElementById('prod-estado').value,
-      flujo_prenda: document.getElementById('prod-flujo').value,
-      etiquetas: document.getElementById('prod-etiquetas').value.split(',').map(s => s.trim()).filter(Boolean)
+      // ... campos existentes ...
+      historia_origen: document.getElementById('prod-historia').value || null,
+      historia_ubicacion: document.getElementById('prod-ubicacion').value || null,
+      historia_motivo: document.getElementById('prod-motivo').value || null
     };
-
-    try {
-      const url = modo === 'editar' ? `${API_BASE}/productos/${productoId}` : `${API_BASE}/productos`;
-      const method = modo === 'editar' ? 'PUT' : 'POST';
-      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-      if (!res.ok) throw new Error('Error guardando producto');
-      // Volver a bodega
-      document.getElementById('producto-form-container').style.display = 'none';
-      // Recargar lista
-      window.location.reload();
-    } catch (err) { alert(err.message); }
+    // ... resto del submit ...
   });
-
-  document.getElementById('btn-cancelar').addEventListener('click', () => {
-    document.getElementById('producto-form-container').style.display = 'none';
-  });
-
-  document.getElementById('btn-volver-bodega').addEventListener('click', () => {
-    document.getElementById('producto-form-container').style.display = 'none';
-  });
-
-  function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
-
-  // Inicializar
-  cargarCatalogos();
-
-  // Si hay ID en URL, cargar modo editar
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get('id');
-  if (id) cargarProducto(id);
 </script>

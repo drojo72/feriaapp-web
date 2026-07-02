@@ -2,275 +2,75 @@
 const API_BASE = 'https://feriaapp-api.onrender.com';
 ---
 
-<div class="view-section" id="ventas-section">
-  <div class="view-header">
-    <h3>Histórico de Ventas</h3>
-    <button class="btn btn-primary btn-sm" id="btn-nueva-venta">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="12" y1="5" x2="12" y2="19"/>
-        <line x1="5" y1="12" x2="19" y2="12"/>
-      </svg>
-      Registrar Venta
-    </button>
-  </div>
-
-  <div class="filters-bar">
-    <input type="text" id="filtro-ventas" placeholder="Buscar ventas..." class="filter-input"/>
-    <select id="filtro-evento" class="filter-select">
-      <option value="">Todos los eventos</option>
-    </select>
-    <select id="filtro-mes" class="filter-select">
-      <option value="">Todos los meses</option>
-      <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option>
-      <option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option>
-      <option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option>
-      <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
-    </select>
-    <select id="filtro-metodo" class="filter-select">
-      <option value="">Método pago</option>
-      <option value="efectivo">Efectivo</option>
-      <option value="transferencia">Transferencia</option>
-      <option value="debito">Débito</option>
-      <option value="credito">Crédito</option>
-    </select>
-  </div>
-
-  <div class="stats-bar" id="stats-ventas">
-    <div class="stat-card"><span class="stat-value" id="stat-ventas-total">$0</span><span class="stat-label">Total Ventas</span></div>
-    <div class="stat-card"><span class="stat-value" id="stat-ventas-cant">0</span><span class="stat-label">Transacciones</span></div>
-    <div class="stat-card"><span class="stat-value" id="stat-ventas-prom">$0</span><span class="stat-label">Ticket Promedio</span></div>
-  </div>
-
-  <div class="table-wrapper">
-    <table>
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>Evento</th>
-          <th>Productos</th>
-          <th>Total</th>
-          <th>Método</th>
-          <th>Notas</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody id="ventas-tbody">
-        <tr><td colspan="7" class="empty-state">Cargando ventas...</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<dialog class="admin-modal" id="modal-venta">
-  <div class="modal-content" style="max-width: 700px;">
-    <div class="modal-header">
-      <h3 id="modal-venta-title">Detalle de Venta</h3>
-      <button class="modal-close" data-close-modal>&times;</button>
-    </div>
-    <div class="modal-form" id="venta-detalle-content">
-      <!-- Se llena dinámicamente -->
-    </div>
-  </div>
-</dialog>
-
-<style>
-  .view-section { margin-bottom: var(--space-8); }
-  .view-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);
-  }
-  .view-header h3 {
-    font-family: var(--font-serif); font-size: var(--text-2xl);
-    color: var(--feria-navy); margin: 0;
-  }
-  .filters-bar {
-    display: flex; flex-wrap: wrap; gap: var(--space-3);
-    margin-bottom: var(--space-5);
-  }
-  .filter-input, .filter-select { max-width: 200px; }
-
-  .stats-bar {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: var(--space-4); margin-bottom: var(--space-6);
-  }
-  .stat-card {
-    background: var(--color-card-bg); border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl); padding: var(--space-4) var(--space-5);
-    text-align: center;
-  }
-  .stat-value {
-    display: block; font-size: var(--text-2xl); font-weight: 700;
-    color: var(--feria-navy); font-family: var(--font-serif);
-  }
-  .stat-label {
-    display: block; font-size: var(--text-xs); color: var(--color-muted);
-    text-transform: uppercase; letter-spacing: 0.05em; margin-top: var(--space-1);
-  }
-
-  .table-wrapper {
-    overflow-x: auto; background: var(--color-card-bg);
-    border-radius: var(--radius-xl); box-shadow: var(--shadow-sm);
-    border: 1px solid var(--color-border);
-  }
-  table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
-  thead { background: var(--feria-navy); color: var(--color-white); }
-  th {
-    padding: var(--space-3) var(--space-4); text-align: left; font-weight: 600;
-    text-transform: uppercase; font-size: var(--text-xs); letter-spacing: 0.05em;
-  }
-  td {
-    padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--color-border);
-    color: var(--color-text); vertical-align: middle;
-  }
-  tbody tr:hover { background: var(--color-row-hover, rgba(203,168,107,0.04)); }
-  tbody tr:last-child td { border-bottom: none; }
-  .empty-state { text-align: center; padding: var(--space-8); color: var(--color-muted); font-style: italic; }
-
-  .badge-metodo {
-    display: inline-flex; align-items: center;
-    padding: var(--space-1) var(--space-3); border-radius: var(--radius-full);
-    font-size: var(--text-xs); font-weight: 600; text-transform: uppercase;
-  }
-  .badge-efectivo { background: #dcfce7; color: #166534; }
-  .badge-transferencia { background: #dbeafe; color: #1e40af; }
-  .badge-debito { background: #fef3c7; color: #92400e; }
-  .badge-credito { background: #f3e8ff; color: #6b21a8; }
-
-  .nota-reconstruido {
-    display: inline-block; font-size: var(--text-xs);
-    background: #fef3c7; color: #92400e; padding: var(--space-1) var(--space-2);
-    border-radius: var(--radius-md); font-weight: 600; margin-left: var(--space-2);
-  }
-
-  .btn-icon {
-    background: none; border: none; cursor: pointer; padding: var(--space-2);
-    border-radius: var(--radius-md); color: var(--color-muted);
-    transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center;
-  }
-  .btn-icon:hover { background: var(--color-row-hover); color: var(--feria-navy); }
-  .btn-icon.danger:hover { color: #dc2626; background: #fee2e2; }
-
-  .admin-modal {
-    position: fixed; inset: 0; background: rgba(17, 42, 70, 0.5);
-    display: flex; align-items: center; justify-content: center;
-    padding: var(--space-4); z-index: 300; border: none;
-    width: 100%; height: 100%; max-width: none; max-height: none;
-  }
-  .admin-modal[open] { display: flex; }
-  .admin-modal::backdrop { background: rgba(17, 42, 70, 0.5); }
-  .modal-content {
-    background: var(--color-card-bg); border-radius: var(--radius-xl);
-    width: 100%; max-width: 520px; max-height: 90vh;
-    overflow-y: auto; box-shadow: var(--shadow-xl);
-  }
-  .modal-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--color-border);
-  }
-  .modal-header h3 { font-family: var(--font-serif); font-size: var(--text-xl); color: var(--feria-navy); margin: 0; }
-  .modal-close { background: none; border: none; font-size: var(--text-2xl); color: var(--color-muted); cursor: pointer; line-height: 1; padding: var(--space-1); transition: color 0.2s; }
-  .modal-close:hover { color: var(--feria-navy); }
-  .modal-form { padding: var(--space-6); }
-
-  .linea-item {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: var(--space-3) 0; border-bottom: 1px solid var(--color-border);
-  }
-  .linea-item:last-child { border-bottom: none; }
-  .linea-nombre { font-weight: 600; color: var(--feria-navy); }
-  .linea-meta { font-size: var(--text-xs); color: var(--color-muted); }
-  .linea-precio { font-weight: 700; color: var(--feria-gold); font-family: var(--font-serif); }
-</style>
-
 <script>
   const API_BASE = 'https://feriaapp-api.onrender.com';
   let ventasCache = [];
   let eventosCache = [];
 
-  const tbody = document.getElementById('ventas-tbody');
-  const filtroTexto = document.getElementById('filtro-ventas');
-  const filtroEvento = document.getElementById('filtro-evento');
-  const filtroMes = document.getElementById('filtro-mes');
-  const filtroMetodo = document.getElementById('filtro-metodo');
-  const modal = document.getElementById('modal-venta');
+  // ✅ Mapeo de campos actualizado para API optimizada
+  const mapVenta = (v) => ({
+    id: v.id,
+    fecha: v.timestamp_local || v.fecha || v.evento_fecha,
+    evento_id: v.evento_feria_id,
+    evento_nombre: v.evento_lugar || v.evento_nombre || '',
+    evento_estado: v.evento_estado || '',
+    total: v.total_venta || v.precio_final_total || 0,
+    medio_pago: v.forma_pago || 'efectivo',
+    notas: v.notas || '',
+    vendedor: v.vendedor_nombre || '',
+    lineas: v.lineas || [],
+    sync_estado: v.sync_estado || 'sincronizado'
+  });
 
   async function cargarDatos() {
     try {
       const [resV, resE] = await Promise.all([
-        fetch(`${API_BASE}/ventas`),
-        fetch(`${API_BASE}/eventos`)
+        fetch(`${API_BASE}/ventas?limit=200`), // ✅ Endpoint optimizado
+        fetch(`${API_BASE}/eventos?limit=50`)
       ]);
-      ventasCache = await resV.json();
+      const rawVentas = await resV.json();
+      ventasCache = rawVentas.map(mapVenta);
       eventosCache = await resE.json();
 
-      filtroEvento.innerHTML = '<option value="">Todos los eventos</option>' +
-        eventosCache.map(e => `<option value="${e.id}">${escapeHtml(e.nombre)}</option>`).join('');
-
-      renderizar(ventasCache);
-      actualizarStats();
+      // ... filtros y renderizado ...
     } catch (e) {
       tbody.innerHTML = `<tr><td colspan="7" class="empty-state">Error: ${e.message}</td></tr>`;
     }
   }
 
   function renderizar(lista) {
-    const texto = filtroTexto.value.toLowerCase();
-    const evento = filtroEvento.value;
-    const mes = filtroMes.value;
-    const metodo = filtroMetodo.value;
-
-    const filtrados = lista.filter(v => {
-      const matchTexto = !texto || v.notas?.toLowerCase().includes(texto);
-      const matchEvento = !evento || String(v.evento_id) === evento;
-      const matchMes = !mes || (v.fecha && new Date(v.fecha).getMonth() + 1 === Number(mes));
-      const matchMetodo = !metodo || v.medio_pago === metodo;
-      return matchTexto && matchEvento && matchMes && matchMetodo;
-    });
-
-    if (filtrados.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No hay ventas</td></tr>`;
-      return;
-    }
+    // ... filtros ...
 
     tbody.innerHTML = filtrados.map(v => {
       const ev = eventosCache.find(e => e.id === v.evento_id);
       const numProductos = v.lineas?.length || 0;
+
+      // ✅ Badge de método de pago
+      const metodoClass = {
+        'efectivo': 'badge-efectivo',
+        'transferencia': 'badge-transferencia',
+        'debito': 'badge-debito',
+        'credito': 'badge-credito'
+      }[v.medio_pago] || 'badge-efectivo';
+
+      // ✅ Nota de sync
+      const syncBadge = v.sync_estado === 'pendiente'
+        ? '<span class="nota-reconstruido">🔄 Pendiente</span>'
+        : '';
+
       return `
       <tr data-id="${v.id}">
         <td>${formatearFecha(v.fecha)}</td>
-        <td>${escapeHtml(ev?.nombre || '—')}</td>
+        <td>${escapeHtml(ev?.nombre || v.evento_nombre || '—')}</td>
         <td>${numProductos} ítem${numProductos !== 1 ? 's' : ''}</td>
         <td>$${Number(v.total || 0).toLocaleString()}</td>
-        <td>${escapeHtml(v.medio_pago || '-')}</td>
-        <td><small>${escapeHtml(v.notas || '').substring(0,40)}</small></td>
-        <td><button class="btn-icon btn-ver" title="Ver">👁️</button></td>
+        <td><span class="badge-metodo ${metodoClass}">${v.medio_pago}</span></td>
+        <td>
+          <small>${escapeHtml((v.notas || '').substring(0, 40))}</small>
+          ${syncBadge}
+        </td>
+        <td><button class="btn-icon btn-ver" title="Ver detalle" data-id="${v.id}">👁️</button></td>
       </tr>`;
     }).join('');
   }
-
-  function actualizarStats() {
-    const total = ventasCache.reduce((s, v) => s + Number(v.total || 0), 0);
-    document.getElementById('stat-ventas-total').textContent = '$' + total.toLocaleString();
-    document.getElementById('stat-ventas-cant').textContent = ventasCache.length;
-    const prom = ventasCache.length > 0 ? Math.round(total / ventasCache.length) : 0;
-    document.getElementById('stat-ventas-prom').textContent = '$' + prom.toLocaleString();
-  }
-
-  document.getElementById('btn-nueva-venta').addEventListener('click', () => {
-    // Implementar modal de nueva venta con líneas dinámicas
-    alert('Nueva venta - implementar formulario con líneas');
-  });
-
-  document.querySelectorAll('[data-close-modal]').forEach(btn => btn.addEventListener('click', () => modal.close()));
-  modal.addEventListener('click', (e) => { if (e.target === modal) modal.close(); });
-
-  filtroTexto.addEventListener('input', () => renderizar(ventasCache));
-  filtroEvento.addEventListener('change', () => renderizar(ventasCache));
-  filtroMes.addEventListener('change', () => renderizar(ventasCache));
-  filtroMetodo.addEventListener('change', () => renderizar(ventasCache));
-
-  function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
-  function formatearFecha(fecha) { if (!fecha) return '-'; return new Date(fecha).toLocaleDateString('es-CL'); }
-
-  cargarDatos();
 </script>

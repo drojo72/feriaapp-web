@@ -1,25 +1,43 @@
 ---
-import AdminLayout from '../layouts/Layout.astro';
-import VentasList from '../components/VentasList.astro';
+import Layout from '../layouts/Layout.astro';
+import HistoricoComponent from '../components/HistoricoComponent.astro';
 ---
 
-<AdminLayout title="Histórico — FeriaApp">
+<Layout title="Histórico — FeriaApp">
   <div class="page-historico">
     <div class="page-header">
-      <h1>Histórico de Ventas</h1>
-      <p class="page-subtitle">Todas las transacciones registradas</p>
+      <h1>📊 Histórico y Auditoría</h1>
+      <p class="page-subtitle">Ventas, ingresos, flujos de productos y gestión de eventos</p>
     </div>
 
-    <VentasList />
+    <HistoricoComponent client:load />
   </div>
-</AdminLayout>
+</Layout>
 
 <style>
-  .page-historico { padding: var(--space-6) var(--space-8); max-width: 1200px; margin: 0 auto; }
-  .page-header { margin-bottom: var(--space-8); }
-  .page-header h1 {
-    font-family: var(--font-serif); font-size: var(--text-3xl);
-    color: var(--feria-navy); margin: 0 0 var(--space-2);
+  .page-historico {
+    padding: var(--space-6) var(--space-8);
+    max-width: 1400px;
+    margin: 0 auto;
   }
-  .page-subtitle { color: var(--color-muted); margin: 0; font-size: var(--text-lg); }
+  .page-header {
+    margin-bottom: var(--space-8);
+  }
+  .page-header h1 {
+    font-family: var(--font-serif);
+    font-size: var(--text-3xl);
+    color: var(--feria-navy);
+    margin: 0 0 var(--space-2);
+  }
+  .page-subtitle {
+    color: var(--color-muted);
+    margin: 0;
+    font-size: var(--text-lg);
+  }
+
+  @media (max-width: 768px) {
+    .page-historico {
+      padding: var(--space-4);
+    }
+  }
 </style>

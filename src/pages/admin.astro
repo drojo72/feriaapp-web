@@ -81,6 +81,10 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
               Bodega
             </button></li>
+            <li><button class="nav-item" data-view="historico">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Histórico
+            </button></li>
           </ul>
         </nav>
         <div class="admin-sidebar__footer">
@@ -97,7 +101,8 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
           </button>
         </div>
       </aside>
-            <main class="admin-main">
+
+      <main class="admin-main">
         <header class="admin-topbar">
           <button class="admin-topbar__menu" id="sidebar-toggle" aria-label="Abrir menú">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -112,7 +117,9 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
         </header>
 
         <div class="admin-views">
-          <!-- View: Resumen -->
+          <!-- ============================================================ -->
+          <!-- VIEW: RESUMEN -->
+          <!-- ============================================================ -->
           <div class="admin-view" id="view-resumen">
             <div class="stats-grid">
               <div class="stat-card">
@@ -181,7 +188,9 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
             </div>
           </div>
 
-          <!-- View: Eventos -->
+          <!-- ============================================================ -->
+          <!-- VIEW: EVENTOS -->
+          <!-- ============================================================ -->
           <div class="admin-view hidden" id="view-eventos">
             <div class="view-header">
               <h3>Gestión de Eventos</h3>
@@ -205,46 +214,11 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
                 <tbody id="eventos-tbody"><tr><td colspan="6" class="empty-state">Cargando eventos...</td></tr></tbody>
               </table>
             </div>
-            <dialog class="admin-modal" id="modal-evento">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h3 id="modal-evento-title">Nuevo Evento</h3>
-                  <button class="modal-close" data-close-modal>&times;</button>
-                </div>
-                <form id="form-evento" class="modal-form">
-                  <input type="hidden" id="evento-id"/>
-                  <div class="form-group">
-                    <label for="evento-nombre">Nombre del Evento *</label>
-                    <input type="text" id="evento-nombre" required placeholder="Ej: Feria Primavera 2026"/>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label for="evento-fecha">Fecha *</label>
-                      <input type="date" id="evento-fecha" required/>
-                    </div>
-                    <div class="form-group">
-                      <label for="evento-hora">Hora</label>
-                      <input type="time" id="evento-hora"/>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label for="evento-ubicacion">Ubicación</label>
-                    <input type="text" id="evento-ubicacion" placeholder="Ej: Plaza Central, Santiago"/>
-                  </div>
-                  <div class="form-group">
-                    <label for="evento-descripcion">Descripción</label>
-                    <textarea id="evento-descripcion" rows="3" placeholder="Detalles del evento..."></textarea>
-                  </div>
-                  <div class="modal-actions">
-                    <button type="button" class="btn btn-outline" data-close-modal>Cancelar</button>
-                    <button type="submit" class="btn btn-primary"><span class="btn-text">Guardar</span><span class="btn-spinner hidden"></span></button>
-                  </div>
-                </form>
-              </div>
-            </dialog>
           </div>
 
-          <!-- View: Ventas -->
+          <!-- ============================================================ -->
+          <!-- VIEW: VENTAS -->
+          <!-- ============================================================ -->
           <div class="admin-view hidden" id="view-ventas">
             <div class="view-header">
               <h3>Registro de Ventas</h3>
@@ -267,7 +241,9 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
             </div>
           </div>
 
-          <!-- View: Bodega -->
+          <!-- ============================================================ -->
+          <!-- VIEW: BODEGA -->
+          <!-- ============================================================ -->
           <div class="admin-view hidden" id="view-bodega">
             <div class="view-header">
               <h3>Inventario de Bodega</h3>
@@ -298,12 +274,214 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
               </table>
             </div>
           </div>
+
+          <!-- ============================================================ -->
+          <!-- VIEW: HISTÓRICO / AUDITORÍA -->
+          <!-- ============================================================ -->
+          <div class="admin-view hidden" id="view-historico">
+            <div class="view-header">
+              <h3>📊 Histórico y Auditoría</h3>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-sm btn-outline" id="btn-refresh-auditoria">🔄 Refrescar</button>
+                <button class="btn btn-sm btn-primary" id="btn-exportar-auditoria">📥 Exportar</button>
+              </div>
+            </div>
+
+            <!-- Tabs internos del histórico -->
+            <div class="tabs-bar historico-tabs">
+              <button class="tab-btn active" data-tab="auditoria">🔍 Auditoría</button>
+              <button class="tab-btn" data-tab="eventos-cerrados">📋 Eventos Cerrados</button>
+              <button class="tab-btn" data-tab="flujos">🔄 Flujos de Productos</button>
+            </div>
+
+            <!-- Panel: Auditoría -->
+            <div class="tab-panel active" id="panel-auditoria">
+              <div class="panel-header">
+                <div class="filters-bar">
+                  <input type="text" id="filtro-auditoria" placeholder="Buscar en auditoría..." class="filter-input"/>
+                  <select id="filtro-auditoria-tipo" class="filter-select">
+                    <option value="">Todos los tipos</option>
+                    <option value="reabrir">🔓 Reapertura</option>
+                    <option value="modificar">✏️ Modificación</option>
+                    <option value="stock">📦 Ajuste de stock</option>
+                    <option value="producto">🏷️ Cambio de producto</option>
+                  </select>
+                  <input type="date" id="filtro-auditoria-desde" class="filter-input" style="max-width:150px"/>
+                  <input type="date" id="filtro-auditoria-hasta" class="filter-input" style="max-width:150px"/>
+                </div>
+              </div>
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Fecha</th>
+                      <th>Tipo</th>
+                      <th>Usuario</th>
+                      <th>Detalle</th>
+                      <th>Justificación</th>
+                    </tr>
+                  </thead>
+                  <tbody id="historico-auditoria-tbody">
+                    <tr><td colspan="5" class="empty-state">Cargando auditoría...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Panel: Eventos Cerrados -->
+            <div class="tab-panel hidden" id="panel-eventos-cerrados">
+              <div class="panel-header">
+                <div class="filters-bar">
+                  <input type="text" id="filtro-eventos-cerrados" placeholder="Buscar..." class="filter-input"/>
+                  <input type="date" id="filtro-eventos-desde" class="filter-input" style="max-width:150px"/>
+                  <input type="date" id="filtro-eventos-hasta" class="filter-input" style="max-width:150px"/>
+                </div>
+              </div>
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Evento</th>
+                      <th>Fecha</th>
+                      <th>Total Calculado</th>
+                      <th>Total Confirmado</th>
+                      <th>Diferencia</th>
+                      <th>Fecha Cierre</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="historico-eventos-tbody">
+                    <tr><td colspan="7" class="empty-state">Cargando eventos cerrados...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Panel: Flujos de Productos -->
+            <div class="tab-panel hidden" id="panel-flujos">
+              <div class="panel-header">
+                <div class="filters-bar">
+                  <input type="text" id="filtro-flujos" placeholder="Buscar producto..." class="filter-input"/>
+                  <select id="filtro-flujo-tipo" class="filter-select">
+                    <option value="">Todos los flujos</option>
+                    <option value="boutique">→ Online</option>
+                    <option value="feria">→ Feria</option>
+                    <option value="donacion">→ Donación</option>
+                    <option value="retazo">→ Retazo</option>
+                  </select>
+                  <select id="filtro-flujo-estado" class="filter-select">
+                    <option value="">Todos los estados</option>
+                    <option value="disponible">Disponible</option>
+                    <option value="vendido">Vendido</option>
+                    <option value="reservado">Reservado</option>
+                    <option value="donado">Donado</option>
+                    <option value="retazo">Retazo</option>
+                  </select>
+                </div>
+              </div>
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Producto</th>
+                      <th>Flujo</th>
+                      <th>Fecha</th>
+                      <th>Motivo</th>
+                      <th>Evaluado por</th>
+                      <th>Historia</th>
+                    </tr>
+                  </thead>
+                  <tbody id="historico-flujos-tbody">
+                    <tr><td colspan="6" class="empty-state">Cargando flujos...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
+
       <div class="admin-overlay" id="admin-overlay"></div>
     </div>
   </div>
-    <style is:global>
+
+  <!-- ============================================================ -->
+  <!-- MODALES -->
+  <!-- ============================================================ -->
+
+  <!-- Modal: Evento -->
+  <dialog class="admin-modal" id="modal-evento">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-evento-title">Nuevo Evento</h3>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+      <form id="form-evento" class="modal-form">
+        <input type="hidden" id="evento-id"/>
+        <div class="form-group">
+          <label for="evento-nombre">Nombre del Evento *</label>
+          <input type="text" id="evento-nombre" required placeholder="Ej: Feria Primavera 2026"/>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="evento-fecha">Fecha *</label>
+            <input type="date" id="evento-fecha" required/>
+          </div>
+          <div class="form-group">
+            <label for="evento-hora">Hora</label>
+            <input type="time" id="evento-hora"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="evento-ubicacion">Ubicación</label>
+          <input type="text" id="evento-ubicacion" placeholder="Ej: Plaza Central, Santiago"/>
+        </div>
+        <div class="form-group">
+          <label for="evento-descripcion">Descripción</label>
+          <textarea id="evento-descripcion" rows="3" placeholder="Detalles del evento..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" data-close-modal>Cancelar</button>
+          <button type="submit" class="btn btn-primary"><span class="btn-text">Guardar</span><span class="btn-spinner hidden"></span></button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Modal: Reabrir Evento (con justificación obligatoria) -->
+  <dialog class="admin-modal" id="modal-reabrir">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3>🔓 Reabrir Evento</h3>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+      <form id="form-reabrir" class="modal-form">
+        <input type="hidden" id="reabrir-evento-id"/>
+        <div class="form-group">
+          <label>Evento</label>
+          <input type="text" id="reabrir-evento-nombre" readonly style="background:var(--color-muted-bg);"/>
+        </div>
+        <div class="form-group">
+          <label for="reabrir-motivo">Motivo de Reapertura *</label>
+          <textarea id="reabrir-motivo" rows="3" placeholder="Explicar detalladamente por qué se reabre el evento..." required></textarea>
+          <small style="color: var(--color-muted);">Esta justificación quedará registrada en el historial de auditoría.</small>
+        </div>
+        <div class="form-group">
+          <label for="reabrir-nota-adicional">Nota adicional (opcional)</label>
+          <input type="text" id="reabrir-nota-adicional" placeholder="Ej: Se detectó venta no registrada"/>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" data-close-modal>Cancelar</button>
+          <button type="submit" class="btn btn-warning">⚠️ Reabrir Evento</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- ============================================================ -->
+  <!-- STYLES -->
+  <!-- ============================================================ -->
+  <style is:global>
     body { background-color: #f0ebe0; }
 
     .admin-loading {
@@ -467,6 +645,7 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
 
     .admin-views { flex: 1; padding: var(--space-6); overflow-y: auto; }
     .admin-view.hidden { display: none; }
+
     .view-header {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);
@@ -522,8 +701,124 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
     .filters-bar {
       display: flex; flex-wrap: wrap; gap: var(--space-3); margin-bottom: var(--space-5);
     }
-    .filter-input, .filter-select { max-width: 250px; }
-    .empty-state { text-align: center; color: var(--feria-tierra); padding: var(--space-8) var(--space-4); }
+    .filter-input, .filter-select {
+      max-width: 250px;
+      padding: var(--space-2) var(--space-3);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      background: var(--color-card-bg);
+    }
+
+    /* Tabs internos del histórico */
+    .tabs-bar.historico-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--color-border);
+      background: var(--feria-crema-light);
+      padding: 0 var(--space-4);
+      margin-bottom: var(--space-6);
+      overflow-x: auto;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+    .tabs-bar .tab-btn {
+      padding: var(--space-3) var(--space-5);
+      background: none;
+      border: none;
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--color-muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+    .tabs-bar .tab-btn:hover { color: var(--feria-navy); }
+    .tabs-bar .tab-btn.active {
+      color: var(--feria-navy);
+      border-bottom-color: var(--feria-gold);
+    }
+
+    .tab-panel { display: block; }
+    .tab-panel.hidden { display: none; }
+
+    .panel-header { margin-bottom: var(--space-4); }
+
+    .table-wrapper {
+      overflow-x: auto;
+      background: var(--color-card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--color-border);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-sm);
+    }
+    thead {
+      background: var(--feria-navy);
+      color: var(--color-white);
+    }
+    th {
+      padding: var(--space-3) var(--space-4);
+      text-align: left;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: var(--text-xs);
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+    td {
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--color-border);
+      color: var(--color-text);
+      vertical-align: middle;
+    }
+    tbody tr:hover { background: var(--color-row-hover, rgba(203,168,107,0.04)); }
+    tbody tr:last-child td { border-bottom: none; }
+    .empty-state {
+      text-align: center;
+      padding: var(--space-8);
+      color: var(--color-muted);
+      font-style: italic;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .badge-activo, .badge-success { background: #dcfce7; color: #166534; }
+    .badge-cerrado, .badge-danger { background: #fee2e2; color: #991b1b; }
+    .badge-programado, .badge-warning { background: #fef3c7; color: #92400e; }
+    .badge-info { background: #dbeafe; color: #1e40af; }
+
+    .btn-spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid currentColor; border-top-color: transparent;
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    .btn-spinner.hidden { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .btn-warning {
+      background: #f59e0b;
+      color: white;
+      border: none;
+      padding: var(--space-2) var(--space-5);
+      border-radius: var(--radius-lg);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-warning:hover { background: #d97706; }
 
     .admin-modal {
       position: fixed; inset: 0;
@@ -535,7 +830,8 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
     .admin-modal[open] { display: flex; }
     .admin-modal::backdrop { background: rgba(17, 42, 70, 0.5); }
     .modal-content {
-      background: var(--color-card-bg); border-radius: var(--radius-xl);
+      background: var(--color-card-bg);
+      border-radius: var(--radius-xl);
       width: 100%; max-width: 520px; max-height: 90vh;
       overflow-y: auto; box-shadow: var(--shadow-xl);
     }
@@ -555,6 +851,24 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
     .modal-close:hover { color: var(--feria-navy); }
     .modal-form { padding: var(--space-6); }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+    .form-group { margin-bottom: var(--space-4); }
+    .form-group label {
+      display: block; font-size: var(--text-sm); font-weight: 600;
+      color: var(--feria-navy); margin-bottom: var(--space-2);
+    }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%; padding: var(--space-3) var(--space-4);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      font-size: var(--text-base);
+      color: var(--color-text);
+      background: var(--color-card-bg);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      font-family: inherit;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      outline: none; border-color: var(--feria-gold); box-shadow: 0 0 0 3px rgba(203, 168, 107, 0.15);
+    }
     .modal-actions {
       display: flex; gap: var(--space-3); justify-content: flex-end;
       margin-top: var(--space-6); padding-top: var(--space-4);
@@ -567,75 +881,131 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
     }
     .admin-overlay.is-visible { display: block; }
     @media (min-width: 1024px) { .admin-overlay.is-visible { display: none; } }
-
-    .btn-spinner {
-      display: inline-block; width: 16px; height: 16px;
-      border: 2px solid currentColor; border-top-color: transparent;
-      border-radius: 50%; animation: spin 0.8s linear infinite;
-    }
-    .btn-spinner.hidden { display: none; }
-    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
-    <script is:inline define:vars={{ API_BASE }}>
+
+  <!-- ============================================================ -->
+  <!-- SCRIPTS -->
+  <!-- ============================================================ -->
+  <script is:inline define:vars={{ API_BASE }}>
     (function() {
       'use strict';
+
+      // ============================================================
+      // STATE
+      // ============================================================
       const state = {
         token: localStorage.getItem('feriaapp_token'),
         user: null,
         currentView: 'resumen',
-        eventos: [], ventas: [], bodega: []
+        eventos: [],
+        ventas: [],
+        bodega: [],
+        auditoria: []
       };
+
+      // ============================================================
+      // DOM HELPERS
+      // ============================================================
       const $ = (s) => document.querySelector(s);
       const $$ = (s) => document.querySelectorAll(s);
-      const fmtDate = (d) => d ? new Date(d).toLocaleDateString('es-CL',{day:'2-digit',month:'short',year:'numeric'}) : '--';
-      const fmtCur = (a) => a != null ? '$'+Number(a).toLocaleString('es-CL') : '--';
 
-      const api = async (ep, opts={}) => {
+      const fmtDate = (d) => d ? new Date(d).toLocaleDateString('es-CL', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      }) : '--';
+
+      const fmtTime = (d) => d ? new Date(d).toLocaleTimeString('es-CL', {
+        hour: '2-digit',
+        minute: '2-digit'
+      }) : '--';
+
+      const fmtDateTime = (d) => d ? `${fmtDate(d)} ${fmtTime(d)}` : '--';
+
+      const fmtCur = (a) => a != null ? '$' + Number(a).toLocaleString('es-CL') : '--';
+
+      const escapeHtml = (text) => {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      };
+
+      // ============================================================
+      // API
+      // ============================================================
+      const api = async (ep, opts = {}) => {
         try {
           const res = await fetch(API_BASE + ep, {
             headers: {
               'Content-Type': 'application/json',
-              ...(state.token ? {'Authorization':'Bearer '+state.token} : {}),
+              ...(state.token ? { 'Authorization': 'Bearer ' + state.token } : {}),
               ...opts.headers
             },
             ...opts,
-            body: opts.body && typeof opts.body=='object' ? JSON.stringify(opts.body) : opts.body
+            body: opts.body && typeof opts.body === 'object' ? JSON.stringify(opts.body) : opts.body
           });
-          const data = await res.json().catch(()=>null);
-          if (res.status===401) { logout(); return null; }
-          return {ok:res.ok, status:res.status, data};
-        } catch(e) {
+
+          const data = await res.json().catch(() => null);
+
+          if (res.status === 401) {
+            // Token inválido o expirado
+            localStorage.removeItem('feriaapp_token');
+            localStorage.removeItem('feriaapp_user');
+            showLogin();
+            return null;
+          }
+
+          return { ok: res.ok, status: res.status, data };
+        } catch (e) {
+          console.error('API Error:', e);
           updateApiStatus(false);
-          return {ok:false, error:e.message};
+          return { ok: false, error: e.message };
         }
       };
 
-      const updateApiStatus = (on) => {
-        const el=$('#api-status'), dot=el?.querySelector('.status-dot');
-        if(el&&dot){ dot.classList.toggle('offline',!on); el.childNodes[2].textContent=on?' Conectado':' Offline'; }
-      };
+      // ============================================================
+      // AUTH
+      // ============================================================
+      const login = async (em, pw) => {
+        const r = await api('/auth/login', {
+          method: 'POST',
+          body: { email: em, password: pw }
+        });
 
-      const login = async (em,pw) => {
-        const r=await api('/auth/login',{method:'POST',body:{email:em,password:pw}});
-        if(r?.ok&&r.data?.token){
-          state.token=r.data.token; state.user=r.data.user;
-          localStorage.setItem('feriaapp_token',r.data.token);
-          if(r.data.user?.nombre) localStorage.setItem('feriaapp_user',JSON.stringify(r.data.user));
+        if (r?.ok && r.data?.token) {
+          state.token = r.data.token;
+          state.user = r.data.user || { nombre: 'Admin' };
+          localStorage.setItem('feriaapp_token', r.data.token);
+          if (r.data.user) {
+            localStorage.setItem('feriaapp_user', JSON.stringify(r.data.user));
+          }
           return true;
         }
         return false;
       };
 
       const logout = () => {
-        state.token=null; state.user=null;
+        state.token = null;
+        state.user = null;
         localStorage.removeItem('feriaapp_token');
         localStorage.removeItem('feriaapp_user');
         showLogin();
       };
 
       const checkAuth = () => {
-        const t=localStorage.getItem('feriaapp_token'), u=localStorage.getItem('feriaapp_user');
-        if(t){ state.token=t; try{state.user=JSON.parse(u)}catch(e){state.user=null;} return true;}
+        const t = localStorage.getItem('feriaapp_token');
+        const u = localStorage.getItem('feriaapp_user');
+
+        if (t) {
+          state.token = t;
+          try {
+            state.user = JSON.parse(u);
+          } catch (e) {
+            state.user = { nombre: 'Admin' };
+          }
+          return true;
+        }
         return false;
       };
 
@@ -649,194 +1019,876 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
         $('#admin-loading')?.classList.add('hidden');
         $('#admin-login')?.classList.add('hidden');
         $('#admin-dashboard')?.classList.remove('hidden');
-        const u=state.user;
-        if(u){ const ne=$('#user-name'),ae=$('#user-avatar');
-          if(ne)ne.textContent=u.nombre||u.email||'Admin';
-          if(ae)ae.textContent=(u.nombre?.[0]||u.email?.[0]||'A').toUpperCase();
+
+        const u = state.user;
+        if (u) {
+          const ne = $('#user-name');
+          const ae = $('#user-avatar');
+          if (ne) ne.textContent = u.nombre || u.email || 'Admin';
+          if (ae) ae.textContent = (u.nombre?.[0] || u.email?.[0] || 'A').toUpperCase();
         }
+
         loadDashboardData();
       };
 
-      const switchView = (vn) => {
-        state.currentView=vn;
-        $$('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.view===vn));
-        const titles={resumen:'Resumen',eventos:'Eventos',ventas:'Ventas',bodega:'Bodega'};
-        const te=$('#view-title'); if(te)te.textContent=titles[vn]||vn;
-        $$('.admin-view').forEach(v=>v.classList.add('hidden'));
-        const ve=$(`#view-${vn}`); if(ve)ve.classList.remove('hidden');
-        if(vn==='eventos')loadEventos(); if(vn==='ventas')loadVentas();
-        if(vn==='bodega')loadBodega(); if(vn==='resumen')loadDashboardData();
-        closeSidebar();
-      };
-
-      const loadDashboardData = async () => {
-        const h=await api('/health'); updateApiStatus(h?.ok);
-        await Promise.all([loadEventosStats(),loadBodegaStats(),loadVentasStats()]);
-        loadResumenEventos(); loadResumenVentas();
-      };
-
-      const loadEventosStats = async () => {
-        const r=await api('/eventos?limit=1');
-        if(r?.ok){ $('#stat-eventos').textContent=r.data?.total||r.data?.length||0; }
-      };
-      const loadBodegaStats = async () => {
-        const r=await api('/bodega?limit=1');
-        if(r?.ok){ $('#stat-bodega').textContent=r.data?.total||r.data?.length||0; }
-      };
-      const loadVentasStats = async () => {
-        const now=new Date(), fd=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0];
-        const r=await api(`/ventas?desde=${fd}&limit=1`);
-        if(r?.ok){
-          const d=r.data?.items||r.data||[];
-          $('#stat-ventas').textContent=r.data?.total||d.length||0;
-          $('#stat-ingresos').textContent=fmtCur(d.reduce((s,v)=>s+(v.total||0),0));
+      // ============================================================
+      // API STATUS
+      // ============================================================
+      const updateApiStatus = (on) => {
+        const el = $('#api-status');
+        const dot = el?.querySelector('.status-dot');
+        if (el && dot) {
+          dot.classList.toggle('offline', !on);
+          const textNode = el.childNodes[2];
+          if (textNode) textNode.textContent = on ? ' Conectado' : ' Offline';
         }
       };
 
+      // ============================================================
+      // NAVIGATION
+      // ============================================================
+      const switchView = (vn) => {
+        state.currentView = vn;
+
+        $$('.nav-item').forEach(b => {
+          b.classList.toggle('active', b.dataset.view === vn);
+        });
+
+        const titles = {
+          resumen: 'Resumen',
+          eventos: 'Eventos',
+          ventas: 'Ventas',
+          bodega: 'Bodega',
+          historico: 'Histórico y Auditoría'
+        };
+        const te = $('#view-title');
+        if (te) te.textContent = titles[vn] || vn;
+
+        $$('.admin-view').forEach(v => v.classList.add('hidden'));
+        const ve = $(`#view-${vn}`);
+        if (ve) ve.classList.remove('hidden');
+
+        // Cargar datos según vista
+        if (vn === 'eventos') loadEventos();
+        if (vn === 'ventas') loadVentas();
+        if (vn === 'bodega') loadBodega();
+        if (vn === 'historico') loadHistorico();
+        if (vn === 'resumen') loadDashboardData();
+
+        closeSidebar();
+      };
+
+      // ============================================================
+      // SIDEBAR
+      // ============================================================
+      const openSidebar = () => {
+        $('#admin-sidebar')?.classList.add('is-open');
+        $('#admin-overlay')?.classList.add('is-visible');
+      };
+
+      const closeSidebar = () => {
+        $('#admin-sidebar')?.classList.remove('is-open');
+        $('#admin-overlay')?.classList.remove('is-visible');
+      };
+
+      // ============================================================
+      // DASHBOARD DATA
+      // ============================================================
+      const loadDashboardData = async () => {
+        const h = await api('/health');
+        updateApiStatus(h?.ok);
+        await Promise.all([
+          loadEventosStats(),
+          loadBodegaStats(),
+          loadVentasStats()
+        ]);
+        loadResumenEventos();
+        loadResumenVentas();
+      };
+
+      const loadEventosStats = async () => {
+        const r = await api('/eventos?estado=activo&limit=1');
+        if (r?.ok) {
+          const total = r.data?.total || r.data?.length || 0;
+          const el = $('#stat-eventos');
+          if (el) el.textContent = total;
+        }
+      };
+
+      const loadBodegaStats = async () => {
+        const r = await api('/productos/bodega?limit=1');
+        if (r?.ok) {
+          const total = r.data?.total || r.data?.length || 0;
+          const el = $('#stat-bodega');
+          if (el) el.textContent = total;
+        }
+      };
+
+      const loadVentasStats = async () => {
+        const now = new Date();
+        const fd = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+        const r = await api(`/ventas?fecha_desde=${fd}&limit=1`);
+
+        if (r?.ok) {
+          const data = r.data?.items || r.data || [];
+          const totalVentas = r.data?.total || data.length || 0;
+          const ingresos = data.reduce((s, v) => s + (v.total_venta || v.total || 0), 0);
+
+          const elVentas = $('#stat-ventas');
+          const elIngresos = $('#stat-ingresos');
+
+          if (elVentas) elVentas.textContent = totalVentas;
+          if (elIngresos) elIngresos.textContent = fmtCur(ingresos);
+        }
+      };
+
+      // ============================================================
+      // RESUMEN - Eventos Recientes
+      // ============================================================
       const loadResumenEventos = async () => {
-        const r=await api('/eventos?limit=5&orden=desc'), tb=$('#resumen-eventos-tbody');
-        if(!tb)return; if(!r?.ok||!r.data?.length){tb.innerHTML='<tr><td colspan="4" class="empty-state">No hay eventos registrados</td></tr>';return;}
-        tb.innerHTML=r.data.slice(0,5).map(e=>{
-          const ec=e.estado==='activo'?'badge-success':e.estado==='cerrado'?'badge-danger':'badge-warning';
-          return `<tr><td><strong>${e.nombre||'Sin nombre'}</strong></td><td>${fmtDate(e.fecha)}</td><td><span class="badge ${ec}">${e.estado||'N/A'}</span></td><td>${fmtCur(e.total_ventas||0)}</td></tr>`;
+        const r = await api('/eventos?limit=5');
+        const tb = $('#resumen-eventos-tbody');
+        if (!tb) return;
+
+        if (!r?.ok || !r.data?.length) {
+          tb.innerHTML = '<tr><td colspan="4" class="empty-state">No hay eventos registrados</td></tr>';
+          return;
+        }
+
+        tb.innerHTML = r.data.slice(0, 5).map(e => {
+          const ec = e.estado === 'activo' ? 'badge-success' :
+            e.estado === 'cerrado' ? 'badge-danger' : 'badge-warning';
+          const total = e.total_recaudado || e.total_confirmado || e.total_calculado || 0;
+          return `<tr>
+            <td><strong>${escapeHtml(e.nombre || e.lugar || 'Sin nombre')}</strong></td>
+            <td>${fmtDate(e.fecha)}</td>
+            <td><span class="badge ${ec}">${e.estado || 'N/A'}</span></td>
+            <td>${fmtCur(total)}</td>
+          </tr>`;
         }).join('');
       };
 
+      // ============================================================
+      // RESUMEN - Ventas Recientes
+      // ============================================================
       const loadResumenVentas = async () => {
-        const r=await api('/ventas?limit=5&orden=desc'), tb=$('#resumen-ventas-tbody');
-        if(!tb)return; if(!r?.ok||!r.data?.length){tb.innerHTML='<tr><td colspan="4" class="empty-state">No hay ventas registradas</td></tr>';return;}
-        tb.innerHTML=r.data.slice(0,5).map(v=>`<tr><td>${fmtDate(v.fecha)}</td><td>${v.evento_nombre||v.evento_id||'N/A'}</td><td><strong>${fmtCur(v.total)}</strong></td><td>${v.cantidad_items||v.items?.length||0}</td></tr>`).join('');
+        const r = await api('/ventas?limit=5');
+        const tb = $('#resumen-ventas-tbody');
+        if (!tb) return;
+
+        if (!r?.ok || !r.data?.length) {
+          tb.innerHTML = '<tr><td colspan="4" class="empty-state">No hay ventas registradas</td></tr>';
+          return;
+        }
+
+        tb.innerHTML = r.data.slice(0, 5).map(v => {
+          const total = v.total_venta || v.total || 0;
+          const items = v.lineas?.length || v.cantidad_items || 0;
+          const evento = v.evento_lugar || v.evento_nombre || 'N/A';
+          const fecha = v.timestamp_local || v.fecha;
+          return `<tr>
+            <td>${fmtDate(fecha)}</td>
+            <td>${escapeHtml(evento)}</td>
+            <td><strong>${fmtCur(total)}</strong></td>
+            <td>${items}</td>
+          </tr>`;
+        }).join('');
       };
 
+      // ============================================================
+      // EVENTOS
+      // ============================================================
       const loadEventos = async () => {
-        const r=await api('/eventos'), tb=$('#eventos-tbody');
-        if(!tb)return; state.eventos=r?.data||[];
-        if(!state.eventos.length){tb.innerHTML='<tr><td colspan="6" class="empty-state">No hay eventos. Crea el primero.</td></tr>';return;}
+        const r = await api('/eventos?limit=100');
+        const tb = $('#eventos-tbody');
+        if (!tb) return;
+
+        state.eventos = r?.data || [];
+
+        if (!state.eventos.length) {
+          tb.innerHTML = '<tr><td colspan="6" class="empty-state">No hay eventos. Crea el primero.</td></tr>';
+          return;
+        }
+
         renderEventos(state.eventos);
       };
+
       const renderEventos = (evs) => {
-        const tb=$('#eventos-tbody');
-        tb.innerHTML=evs.map(e=>{
-          const ec=e.estado==='activo'?'badge-success':e.estado==='cerrado'?'badge-danger':'badge-warning';
-          const pc=e.estado==='activo';
-          return `<tr data-id="${e.id}"><td><strong>${e.nombre||'Sin nombre'}</strong></td><td>${fmtDate(e.fecha)}</td><td>${e.ubicacion||'--'}</td><td><span class="badge ${ec}">${e.estado||'N/A'}</span></td><td>${fmtCur(e.total_ventas||0)}</td><td><div style="display:flex;gap:4px">${pc?`<button class="btn btn-sm btn-danger" data-action="cerrar" data-id="${e.id}">Cerrar</button>`:''}<button class="btn btn-sm btn-outline" data-action="editar" data-id="${e.id}">Editar</button></div></td></tr>`;
+        const tb = $('#eventos-tbody');
+        if (!tb) return;
+
+        tb.innerHTML = evs.map(e => {
+          const ec = e.estado === 'activo' ? 'badge-success' :
+            e.estado === 'cerrado' ? 'badge-danger' : 'badge-warning';
+          const pc = e.estado === 'activo';
+          const total = e.total_recaudado || e.total_confirmado || e.total_calculado || 0;
+          const canal = e.canal_venta_nombre ?
+            `<br><small style="color:var(--color-muted)">${escapeHtml(e.canal_venta_nombre)}</small>` :
+            '';
+
+          return `<tr data-id="${e.id}">
+            <td><strong>${escapeHtml(e.nombre || e.lugar || 'Sin nombre')}</strong>${canal}</td>
+            <td>${fmtDate(e.fecha)}</td>
+            <td>${escapeHtml(e.lugar || '--')}</td>
+            <td><span class="badge ${ec}">${e.estado || 'N/A'}</span></td>
+            <td>${fmtCur(total)}</td>
+            <td>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                ${pc ? `<button class="btn btn-sm btn-danger" data-action="cerrar" data-id="${e.id}">Cerrar</button>` : ''}
+                ${e.estado === 'cerrado' ? `<button class="btn btn-sm btn-warning" data-action="reabrir" data-id="${e.id}" data-nombre="${escapeHtml(e.nombre || e.lugar || 'Evento')}">🔓 Reabrir</button>` : ''}
+                <button class="btn btn-sm btn-outline" data-action="editar" data-id="${e.id}">Editar</button>
+              </div>
+            </td>
+          </tr>`;
         }).join('');
+
+        // Event listeners para acciones
+        tb.querySelectorAll('[data-action="cerrar"]').forEach(btn => {
+          btn.addEventListener('click', () => cerrarEvento(btn.dataset.id));
+        });
+
+        tb.querySelectorAll('[data-action="reabrir"]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.getElementById('reabrir-evento-id').value = btn.dataset.id;
+            document.getElementById('reabrir-evento-nombre').value = btn.dataset.nombre;
+            document.getElementById('modal-reabrir').showModal();
+          });
+        });
+
+        tb.querySelectorAll('[data-action="editar"]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            alert('✏️ Editar evento #' + btn.dataset.id + ' - En desarrollo');
+          });
+        });
       };
 
+      // ============================================================
+      // CERRAR EVENTO
+      // ============================================================
+      const cerrarEvento = async (id) => {
+        const total = prompt('Ingresa el total confirmado para el cierre:');
+        if (total === null) return;
+        const totalNum = Number(total);
+        if (isNaN(totalNum) || totalNum < 0) {
+          alert('Debes ingresar un número válido.');
+          return;
+        }
+
+        const confirmar = confirm(`¿Cerrar evento #${id} con total $${totalNum.toLocaleString()}?`);
+        if (!confirmar) return;
+
+        const r = await api(`/eventos/${id}/cerrar`, {
+          method: 'POST',
+          body: { total_confirmado: totalNum }
+        });
+
+        if (r?.ok) {
+          alert('✅ Evento cerrado exitosamente');
+          loadEventos();
+          loadDashboardData();
+        } else {
+          alert('❌ Error: ' + (r?.data?.detail || 'Error desconocido'));
+        }
+      };
+
+      // ============================================================
+      // REABRIR EVENTO (con justificación)
+      // ============================================================
+      document.getElementById('form-reabrir')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const id = document.getElementById('reabrir-evento-id').value;
+        const motivo = document.getElementById('reabrir-motivo').value.trim();
+        const notaAdicional = document.getElementById('reabrir-nota-adicional').value.trim();
+
+        if (!motivo) {
+          alert('⚠️ Debes escribir el motivo de la reapertura.');
+          return;
+        }
+
+        if (!confirm(`¿Estás seguro de reabrir el evento #${id}?\n\nMotivo: ${motivo}`)) return;
+
+        const payload = {
+          nota_reapertura: motivo,
+          nota_adicional: notaAdicional || null
+        };
+
+        const r = await api(`/eventos/${id}/reabrir`, {
+          method: 'POST',
+          body: payload
+        });
+
+        if (r?.ok) {
+          alert('✅ Evento reabierto exitosamente. La justificación ha sido registrada en auditoría.');
+          document.getElementById('modal-reabrir').close();
+          document.getElementById('form-reabrir').reset();
+          loadEventos();
+          loadDashboardData();
+          // Si estamos en histórico, recargar auditoría
+          if (state.currentView === 'historico') loadAuditoria();
+        } else {
+          alert('❌ Error al reabrir: ' + (r?.data?.detail || 'Error desconocido'));
+        }
+      });
+
+      // ============================================================
+      // VENTAS
+      // ============================================================
       const loadVentas = async () => {
-        const r=await api('/ventas'), tb=$('#ventas-tbody');
-        if(!tb)return; state.ventas=r?.data||[];
-        if(!state.ventas.length){tb.innerHTML='<tr><td colspan="7" class="empty-state">No hay ventas registradas</td></tr>';return;}
+        const desde = document.getElementById('filtro-fecha-desde')?.value || '';
+        const hasta = document.getElementById('filtro-fecha-hasta')?.value || '';
+        const eventoId = document.getElementById('filtro-evento-venta')?.value || '';
+
+        let url = '/ventas?limit=100';
+        if (desde) url += `&fecha_desde=${desde}`;
+        if (hasta) url += `&fecha_hasta=${hasta}`;
+        if (eventoId) url += `&evento_id=${eventoId}`;
+
+        const r = await api(url);
+        const tb = $('#ventas-tbody');
+        if (!tb) return;
+
+        state.ventas = r?.data || [];
+
+        // Cargar eventos en filtro
+        if (!document.querySelector('#filtro-evento-venta option[value=""]')) {
+          const evRes = await api('/eventos?limit=100');
+          if (evRes?.ok) {
+            const select = document.getElementById('filtro-evento-venta');
+            select.innerHTML = '<option value="">Todos los eventos</option>' +
+              evRes.data.map(e => `<option value="${e.id}">${escapeHtml(e.nombre || e.lugar || 'Sin nombre')}</option>`).join('');
+          }
+        }
+
+        if (!state.ventas.length) {
+          tb.innerHTML = '<tr><td colspan="7" class="empty-state">No hay ventas registradas</td></tr>';
+          return;
+        }
+
         renderVentas(state.ventas);
       };
-      const renderVentas = (vs) => {
-        $('#ventas-tbody').innerHTML=vs.map(v=>`<tr><td>#${v.id||'--'}</td><td>${fmtDate(v.fecha)}</td><td>${v.evento_nombre||v.evento_id||'N/A'}</td><td>${v.cantidad_items||v.items?.length||0}</td><td><strong>${fmtCur(v.total)}</strong></td><td>${v.metodo_pago||'Efectivo'}</td><td><span style="font-size:0.75rem;color:var(--feria-tierra)">${v.notas||'--'}</span></td></tr>`).join('');
-      };
 
-      const loadBodega = async () => {
-        const r=await api('/bodega'), tb=$('#bodega-tbody');
-        if(!tb)return; state.bodega=r?.data||[];
-        if(!state.bodega.length){tb.innerHTML='<tr><td colspan="7" class="empty-state">Bodega vacía. Agrega productos.</td></tr>';return;}
-        renderBodega(state.bodega);
-      };
-      const renderBodega = (ps) => {
-        $('#bodega-tbody').innerHTML=ps.map(p=>{
-          const sb=(p.stock||0)<5&&(p.stock||0)>0, ag=(p.stock||0)===0;
-          const ec=ag?'badge-danger':sb?'badge-warning':'badge-success';
-          const et=ag?'Agotado':sb?'Stock Bajo':'Disponible';
-          return `<tr data-id="${p.id}"><td><code style="font-size:0.75rem">${p.codigo||p.id}</code></td><td><strong>${p.nombre||'Sin nombre'}</strong></td><td>${p.categoria||'--'}</td><td>${p.stock||0}</td><td>${fmtCur(p.precio)}</td><td><span class="badge ${ec}">${et}</span></td><td><button class="btn btn-sm btn-outline" data-action="editar-producto" data-id="${p.id}">Editar</button></td></tr>`;
+      const renderVentas = (vs) => {
+        const tb = $('#ventas-tbody');
+        if (!tb) return;
+
+        tb.innerHTML = vs.map(v => {
+          const total = v.total_venta || v.total || 0;
+          const items = v.lineas?.length || v.cantidad_items || 0;
+          const metodo = v.forma_pago || '--';
+          const evento = v.evento_lugar || v.evento_nombre || 'N/A';
+          const fecha = v.timestamp_local || v.fecha;
+
+          return `<tr>
+            <td><code>#${v.id}</code></td>
+            <td>${fmtDate(fecha)}</td>
+            <td>${escapeHtml(evento)}</td>
+            <td>${items}</td>
+            <td><strong>${fmtCur(total)}</strong></td>
+            <td>${escapeHtml(metodo)}</td>
+            <td><small>${escapeHtml((v.notas || '').substring(0, 30))}</small></td>
+          </tr>`;
         }).join('');
       };
 
-      const cerrarEvento = async (id) => {
-        if(!confirm('¿Cerrar este evento? Las ventas quedarán archivadas.'))return;
-        const r=await api(`/eventos/${id}/cerrar`,{method:'POST'});
-        if(r?.ok){loadEventos();loadDashboardData();}
+      // ============================================================
+      // BODEGA
+      // ============================================================
+      const loadBodega = async () => {
+        const r = await api('/productos/bodega?limit=200');
+        const tb = $('#bodega-tbody');
+        if (!tb) return;
+
+        state.bodega = r?.data || [];
+
+        if (!state.bodega.length) {
+          tb.innerHTML = '<tr><td colspan="7" class="empty-state">Bodega vacía. Agrega productos.</td></tr>';
+          return;
+        }
+
+        renderBodega(state.bodega);
       };
 
-      const openSidebar = () => { $('#admin-sidebar')?.classList.add('is-open'); $('#admin-overlay')?.classList.add('is-visible'); };
-      const closeSidebar = () => { $('#admin-sidebar')?.classList.remove('is-open'); $('#admin-overlay')?.classList.remove('is-visible'); };
+      const renderBodega = (ps) => {
+        const tb = $('#bodega-tbody');
+        if (!tb) return;
 
+        tb.innerHTML = ps.map(p => {
+          const stock = p.stock || 0;
+          const sb = stock < 5 && stock > 0;
+          const ag = stock === 0;
+          const ec = ag ? 'badge-danger' : sb ? 'badge-warning' : 'badge-success';
+          const et = ag ? 'Agotado' : sb ? 'Stock Bajo' : 'Disponible';
+
+          const historia = p.historia_origen ?
+            `<br><small style="color: var(--feria-gold); font-style: italic;">📖 ${escapeHtml(p.historia_origen.substring(0, 40))}${p.historia_origen.length > 40 ? '...' : ''}</small>` :
+            '';
+
+          return `<tr data-id="${p.id}">
+            <td><code style="font-size:0.75rem;">${escapeHtml(p.sku || p.codigo_barras || p.id)}</code></td>
+            <td>
+              <strong>${escapeHtml(p.nombre || 'Sin nombre')}</strong>
+              ${historia}
+            </td>
+            <td>${escapeHtml(p.categoria_feriaapp_nombre || p.categoria_revistete_nombre || '--')}</td>
+            <td>${stock}</td>
+            <td>${fmtCur(p.precio_final || p.precio_feria || p.precio_standard || 0)}</td>
+            <td><span class="badge ${ec}">${et}</span></td>
+            <td>
+              <button class="btn btn-sm btn-outline" data-action="editar-producto" data-id="${p.id}">Editar</button>
+              ${p.historia_origen ? `<button class="btn btn-sm btn-outline" data-action="ver-historia" data-id="${p.id}" style="font-size:0.7rem;">📖</button>` : ''}
+            </td>
+          </tr>`;
+        }).join('');
+
+        tb.querySelectorAll('[data-action="editar-producto"]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            window.location.href = `/?editar=${btn.dataset.id}`;
+          });
+        });
+
+        tb.querySelectorAll('[data-action="ver-historia"]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const p = state.bodega.find(item => String(item.id) === btn.dataset.id);
+            if (p?.historia_origen) {
+              alert(`📖 Historia de "${p.nombre}"
+━━━━━━━━━━━━━━━━━━━━━━━
+${p.historia_origen}
+${p.historia_ubicacion ? `\n📍 ${p.historia_ubicacion}` : ''}
+${p.historia_motivo ? `\n💡 Motivo: ${p.historia_motivo}` : ''}`);
+            } else {
+              alert('Esta prenda aún no tiene historia registrada.');
+            }
+          });
+        });
+      };
+
+      // ============================================================
+      // HISTÓRICO / AUDITORÍA
+      // ============================================================
+      const loadHistorico = () => {
+        // Activar pestaña por defecto
+        document.querySelectorAll('.historico-tabs .tab-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        const firstTab = document.querySelector('.historico-tabs .tab-btn');
+        if (firstTab) firstTab.classList.add('active');
+
+        document.querySelectorAll('.historico-tabs + .tab-panel').forEach(p => p.classList.add('hidden'));
+        const firstPanel = document.querySelector('.historico-tabs + .tab-panel');
+        if (firstPanel) firstPanel.classList.remove('hidden');
+
+        loadAuditoria();
+        loadEventosCerrados();
+        loadFlujos();
+      };
+
+      // ============================================================
+      // AUDITORÍA
+      // ============================================================
+      const loadAuditoria = async () => {
+        const tb = document.getElementById('historico-auditoria-tbody');
+        if (!tb) return;
+
+        const texto = document.getElementById('filtro-auditoria')?.value || '';
+        const tipo = document.getElementById('filtro-auditoria-tipo')?.value || '';
+        const desde = document.getElementById('filtro-auditoria-desde')?.value || '';
+        const hasta = document.getElementById('filtro-auditoria-hasta')?.value || '';
+
+        let url = `/auditoria?limit=100`;
+        if (texto) url += `&search=${encodeURIComponent(texto)}`;
+        if (tipo) url += `&tipo=${tipo}`;
+        if (desde) url += `&fecha_desde=${desde}`;
+        if (hasta) url += `&fecha_hasta=${hasta}`;
+
+        const r = await api(url);
+        if (!r?.ok || !r.data?.length) {
+          tb.innerHTML = '<tr><td colspan="5" class="empty-state">No hay registros de auditoría</td></tr>';
+          return;
+        }
+
+        state.auditoria = r.data;
+
+        tb.innerHTML = r.data.map(a => {
+          const tipoLabel = a.tipo || '--';
+          const tipoClass = tipoLabel === 'reabrir' ? 'badge-warning' :
+            tipoLabel === 'modificar' ? 'badge-info' :
+            tipoLabel === 'stock' ? 'badge-danger' : 'badge-success';
+
+          return `<tr>
+            <td>${fmtDateTime(a.created_at || a.fecha_cambio)}</td>
+            <td><span class="badge ${tipoClass}">${tipoLabel}</span></td>
+            <td>${escapeHtml(a.usuario_nombre || a.operador || '--')}</td>
+            <td>${escapeHtml(a.detalle || a.campo_afectado || '--')}</td>
+            <td><small><em>${escapeHtml(a.justificacion || a.motivo || '--')}</em></small></td>
+          </tr>`;
+        }).join('');
+      };
+
+      // ============================================================
+      // EVENTOS CERRADOS
+      // ============================================================
+      const loadEventosCerrados = async () => {
+        const tb = document.getElementById('historico-eventos-tbody');
+        if (!tb) return;
+
+        const texto = document.getElementById('filtro-eventos-cerrados')?.value || '';
+        const desde = document.getElementById('filtro-eventos-desde')?.value || '';
+        const hasta = document.getElementById('filtro-eventos-hasta')?.value || '';
+
+        let url = `/eventos?estado=cerrado&limit=100`;
+        if (texto) url += `&search=${encodeURIComponent(texto)}`;
+        if (desde) url += `&fecha_desde=${desde}`;
+        if (hasta) url += `&fecha_hasta=${hasta}`;
+
+        const r = await api(url);
+        if (!r?.ok || !r.data?.length) {
+          tb.innerHTML = '<tr><td colspan="7" class="empty-state">No hay eventos cerrados</td></tr>';
+          return;
+        }
+
+        tb.innerHTML = r.data.map(e => {
+          const diff = (e.diferencia || 0) !== 0;
+          return `<tr data-id="${e.id}">
+            <td><strong>${escapeHtml(e.nombre || e.lugar || 'Sin nombre')}</strong></td>
+            <td>${fmtDate(e.fecha)}</td>
+            <td>${fmtCur(e.total_calculado || 0)}</td>
+            <td>${fmtCur(e.total_confirmado || 0)}</td>
+            <td class="${diff ? 'text-danger' : ''}">${fmtCur(e.diferencia || 0)}</td>
+            <td>${fmtDate(e.fecha_cierre)}</td>
+            <td>
+              <button class="btn btn-sm btn-warning btn-reabrir" data-id="${e.id}" data-nombre="${escapeHtml(e.nombre || e.lugar || 'Evento')}">🔓 Reabrir</button>
+            </td>
+          </tr>`;
+        }).join('');
+
+        tb.querySelectorAll('.btn-reabrir').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.getElementById('reabrir-evento-id').value = btn.dataset.id;
+            document.getElementById('reabrir-evento-nombre').value = btn.dataset.nombre;
+            document.getElementById('modal-reabrir').showModal();
+          });
+        });
+      };
+
+      // ============================================================
+      // FLUJOS DE PRODUCTOS
+      // ============================================================
+      const loadFlujos = async () => {
+        const tb = document.getElementById('historico-flujos-tbody');
+        if (!tb) return;
+
+        const texto = document.getElementById('filtro-flujos')?.value || '';
+        const tipo = document.getElementById('filtro-flujo-tipo')?.value || '';
+        const estado = document.getElementById('filtro-flujo-estado')?.value || '';
+
+        let url = `/productos/flujos?limit=100`;
+        if (texto) url += `&search=${encodeURIComponent(texto)}`;
+        if (tipo) url += `&tipo=${tipo}`;
+        if (estado) url += `&estado=${estado}`;
+
+        const r = await api(url);
+        if (!r?.ok || !r.data?.length) {
+          tb.innerHTML = '<tr><td colspan="6" class="empty-state">No hay flujos registrados</td></tr>';
+          return;
+        }
+
+        tb.innerHTML = r.data.map(f => {
+          const tipoLabel = f.tipo || '--';
+          const tipoClass = tipoLabel === 'boutique' ? 'badge-success' :
+            tipoLabel === 'feria' ? 'badge-warning' :
+            tipoLabel === 'donacion' ? 'badge-info' : 'badge-danger';
+
+          return `<tr>
+            <td><strong>${escapeHtml(f.producto_nombre || 'Sin nombre')}</strong></td>
+            <td><span class="badge ${tipoClass}">${tipoLabel}</span></td>
+            <td>${fmtDate(f.fecha_movimiento || f.created_at)}</td>
+            <td>${escapeHtml(f.motivo || '--')}</td>
+            <td>${escapeHtml(f.evaluado_por || '--')}</td>
+            <td><small>${escapeHtml((f.historia_origen || '').substring(0, 60))}${(f.historia_origen || '').length > 60 ? '...' : ''}</small></td>
+          </tr>`;
+        }).join('');
+      };
+
+      // ============================================================
+      // FILTROS (eventos en tiempo real)
+      // ============================================================
+      // Eventos
+      document.getElementById('filtro-eventos')?.addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase();
+        const filtered = state.eventos.filter(ev =>
+          (ev.nombre || '').toLowerCase().includes(q) ||
+          (ev.lugar || '').toLowerCase().includes(q)
+        );
+        renderEventos(filtered);
+      });
+
+      document.getElementById('filtro-estado')?.addEventListener('change', (e) => {
+        const st = e.target.value;
+        const filtered = st ? state.eventos.filter(ev => ev.estado === st) : state.eventos;
+        renderEventos(filtered);
+      });
+
+      // Ventas
+      document.getElementById('filtro-fecha-desde')?.addEventListener('change', loadVentas);
+      document.getElementById('filtro-fecha-hasta')?.addEventListener('change', loadVentas);
+      document.getElementById('filtro-evento-venta')?.addEventListener('change', loadVentas);
+
+      // Bodega
+      document.getElementById('filtro-bodega')?.addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase();
+        const filtered = state.bodega.filter(p =>
+          (p.nombre || '').toLowerCase().includes(q) ||
+          (p.sku || '').toLowerCase().includes(q)
+        );
+        renderBodega(filtered);
+      });
+
+      document.getElementById('filtro-stock')?.addEventListener('change', (e) => {
+        const t = e.target.value;
+        let filtered = state.bodega;
+        if (t === 'bajo') filtered = state.bodega.filter(p => (p.stock || 0) < 5 && (p.stock || 0) > 0);
+        if (t === 'agotado') filtered = state.bodega.filter(p => (p.stock || 0) === 0);
+        renderBodega(filtered);
+      });
+
+      // Auditoría
+      document.getElementById('filtro-auditoria')?.addEventListener('input', loadAuditoria);
+      document.getElementById('filtro-auditoria-tipo')?.addEventListener('change', loadAuditoria);
+      document.getElementById('filtro-auditoria-desde')?.addEventListener('change', loadAuditoria);
+      document.getElementById('filtro-auditoria-hasta')?.addEventListener('change', loadAuditoria);
+
+      // Eventos cerrados
+      document.getElementById('filtro-eventos-cerrados')?.addEventListener('input', loadEventosCerrados);
+      document.getElementById('filtro-eventos-desde')?.addEventListener('change', loadEventosCerrados);
+      document.getElementById('filtro-eventos-hasta')?.addEventListener('change', loadEventosCerrados);
+
+      // Flujos
+      document.getElementById('filtro-flujos')?.addEventListener('input', loadFlujos);
+      document.getElementById('filtro-flujo-tipo')?.addEventListener('change', loadFlujos);
+      document.getElementById('filtro-flujo-estado')?.addEventListener('change', loadFlujos);
+
+      // ============================================================
+      // BOTONES Y ACCIONES GLOBALES
+      // ============================================================
+      // Navegación desde botones de resumen
+      document.querySelectorAll('[data-action="ver-eventos"], [data-action="ver-ventas"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = btn.dataset.action === 'ver-eventos' ? 'eventos' : 'ventas';
+          switchView(target);
+        });
+      });
+
+      // Nuevo evento
+      document.getElementById('btn-nuevo-evento')?.addEventListener('click', () => {
+        document.getElementById('modal-evento-title').textContent = 'Nuevo Evento';
+        document.getElementById('evento-id').value = '';
+        document.getElementById('form-evento').reset();
+        document.getElementById('modal-evento').showModal();
+      });
+
+      // Formulario de evento
+      document.getElementById('form-evento')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const btn = e.target.querySelector('button[type="submit"]');
+        const txt = btn?.querySelector('.btn-text');
+        const sp = btn?.querySelector('.btn-spinner');
+        if (txt) txt.classList.add('hidden');
+        if (sp) sp.classList.remove('hidden');
+        if (btn) btn.disabled = true;
+
+        const payload = {
+          nombre: document.getElementById('evento-nombre').value,
+          fecha: document.getElementById('evento-fecha').value,
+          hora: document.getElementById('evento-hora').value || null,
+          ubicacion: document.getElementById('evento-ubicacion').value || null,
+          descripcion: document.getElementById('evento-descripcion').value || null
+        };
+
+        const r = await api('/eventos', {
+          method: 'POST',
+          body: payload
+        });
+
+        if (txt) txt.classList.remove('hidden');
+        if (sp) sp.classList.add('hidden');
+        if (btn) btn.disabled = false;
+
+        if (r?.ok) {
+          document.getElementById('modal-evento').close();
+          loadEventos();
+          loadDashboardData();
+          alert('✅ Evento creado exitosamente');
+        } else {
+          alert('❌ Error: ' + (r?.data?.detail || 'Error desconocido'));
+        }
+      });
+
+      // Cerrar modales
+      document.querySelectorAll('[data-close-modal]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const modal = btn.closest('dialog');
+          if (modal) modal.close();
+        });
+      });
+
+      // Cerrar modal al hacer click fuera
+      document.querySelectorAll('.admin-modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) modal.close();
+        });
+      });
+
+      // ============================================================
+      // TABS DEL HISTÓRICO
+      // ============================================================
+      document.querySelectorAll('.historico-tabs .tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.historico-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          document.querySelectorAll('.historico-tabs + .tab-panel, .historico-tabs ~ .tab-panel').forEach(p => p.classList.add('hidden'));
+
+          const panelId = 'panel-' + btn.dataset.tab;
+          const panel = document.getElementById(panelId);
+          if (panel) panel.classList.remove('hidden');
+
+          // Cargar datos según pestaña
+          const tab = btn.dataset.tab;
+          if (tab === 'auditoria') loadAuditoria();
+          if (tab === 'eventos-cerrados') loadEventosCerrados();
+          if (tab === 'flujos') loadFlujos();
+        });
+      });
+
+      // ============================================================
+      // REFRESH AUDITORÍA
+      // ============================================================
+      document.getElementById('btn-refresh-auditoria')?.addEventListener('click', () => {
+        loadAuditoria();
+        loadEventosCerrados();
+        loadFlujos();
+      });
+
+      // ============================================================
+      // EXPORTAR AUDITORÍA
+      // ============================================================
+      document.getElementById('btn-exportar-auditoria')?.addEventListener('click', () => {
+        if (!state.auditoria || !state.auditoria.length) {
+          alert('No hay datos para exportar.');
+          return;
+        }
+
+        let csv = 'Fecha,Tipo,Usuario,Detalle,Justificación\n';
+        state.auditoria.forEach(a => {
+          const fecha = fmtDateTime(a.created_at || a.fecha_cambio);
+          const tipo = a.tipo || '--';
+          const usuario = a.usuario_nombre || a.operador || '--';
+          const detalle = (a.detalle || a.campo_afectado || '--').replace(/,/g, ';');
+          const justificacion = (a.justificacion || a.motivo || '--').replace(/,/g, ';');
+          csv += `${fecha},${tipo},${usuario},${detalle},${justificacion}\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `auditoria_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+      });
+
+      // ============================================================
+      // NUEVO PRODUCTO
+      // ============================================================
+      document.getElementById('btn-nuevo-producto')?.addEventListener('click', () => {
+        window.location.href = '/?nuevo=1';
+      });
+
+      // ============================================================
+      // NUEVA VENTA
+      // ============================================================
+      document.getElementById('btn-nueva-venta')?.addEventListener('click', () => {
+        alert('🧾 Registrar nueva venta - En desarrollo');
+        // Aquí iría el modal/formulario de venta
+      });
+
+      // ============================================================
+      // LOGOUT
+      // ============================================================
+      document.getElementById('btn-logout')?.addEventListener('click', logout);
+
+      // ============================================================
+      // SIDEBAR TOGGLE
+      // ============================================================
+      document.getElementById('sidebar-toggle')?.addEventListener('click', openSidebar);
+      document.getElementById('sidebar-close')?.addEventListener('click', closeSidebar);
+      document.getElementById('admin-overlay')?.addEventListener('click', closeSidebar);
+
+      // ============================================================
+      // NAVEGACIÓN POR TECLADO (Escape para cerrar sidebar)
+      // ============================================================
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeSidebar();
+          document.querySelectorAll('.admin-modal[open]').forEach(m => m.close());
+        }
+      });
+
+      // ============================================================
+      // INICIALIZACIÓN
+      // ============================================================
       const init = () => {
-        if(checkAuth())showDashboard(); else showLogin();
+        if (checkAuth()) {
+          showDashboard();
+        } else {
+          showLogin();
+        }
 
-        $('#login-form')?.addEventListener('submit',async(e)=>{
+        // Login
+        document.getElementById('login-form')?.addEventListener('submit', async (e) => {
           e.preventDefault();
-          $('#login-error')?.classList.add('hidden');
-          const btn=e.target.querySelector('button[type="submit"]');
-          const txt=btn.querySelector('.btn-text'), sp=btn.querySelector('.btn-spinner');
-          txt?.classList.add('hidden'); sp?.classList.remove('hidden'); btn.disabled=true;
-          const ok=await login($('#login-email').value.trim(),$('#login-password').value);
-          txt?.classList.remove('hidden'); sp?.classList.add('hidden'); btn.disabled=false;
-          if(ok)showDashboard(); else { const le=$('#login-error'); if(le){le.textContent='Email o contraseña incorrectos.';le.classList.remove('hidden');} }
+          document.getElementById('login-error')?.classList.add('hidden');
+
+          const btn = e.target.querySelector('button[type="submit"]');
+          const txt = btn?.querySelector('.btn-text');
+          const sp = btn?.querySelector('.btn-spinner');
+          if (txt) txt.classList.add('hidden');
+          if (sp) sp.classList.remove('hidden');
+          if (btn) btn.disabled = true;
+
+          const email = document.getElementById('login-email').value.trim();
+          const password = document.getElementById('login-password').value;
+          const ok = await login(email, password);
+
+          if (txt) txt.classList.remove('hidden');
+          if (sp) sp.classList.add('hidden');
+          if (btn) btn.disabled = false;
+
+          if (ok) {
+            showDashboard();
+          } else {
+            const le = document.getElementById('login-error');
+            if (le) {
+              le.textContent = 'Email o contraseña incorrectos.';
+              le.classList.remove('hidden');
+            }
+          }
         });
 
-        $('#btn-logout')?.addEventListener('click',logout);
-        $('#sidebar-toggle')?.addEventListener('click',openSidebar);
-        $('#sidebar-close')?.addEventListener('click',closeSidebar);
-        $('#admin-overlay')?.addEventListener('click',closeSidebar);
-        $$('.nav-item').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));
-
-        $('#btn-nuevo-evento')?.addEventListener('click',()=>{
-          $('#modal-evento-title').textContent='Nuevo Evento';
-          $('#evento-id').value=''; $('#form-evento').reset();
-          $('#modal-evento')?.showModal();
-        });
-        $$('[data-close-modal]').forEach(b=>b.addEventListener('click',()=>$('#modal-evento')?.close()));
-
-        $('#form-evento')?.addEventListener('submit',async(e)=>{
-          e.preventDefault();
-          const btn=e.target.querySelector('button[type="submit"]');
-          const txt=btn.querySelector('.btn-text'), sp=btn.querySelector('.btn-spinner');
-          txt?.classList.add('hidden'); sp?.classList.remove('hidden'); btn.disabled=true;
-          const r=await api('/eventos',{method:'POST',body:{
-            nombre:$('#evento-nombre').value,
-            fecha:$('#evento-fecha').value,
-            hora:$('#evento-hora').value||null,
-            ubicacion:$('#evento-ubicacion').value||null,
-            descripcion:$('#evento-descripcion').value||null
-          }});
-          txt?.classList.remove('hidden'); sp?.classList.add('hidden'); btn.disabled=false;
-          if(r?.ok){$('#modal-evento')?.close();loadEventos();loadDashboardData();}
-          else alert('Error: '+(r?.data?.error||'Error desconocido'));
-        });
-
-        document.addEventListener('click',(e)=>{
-          const b=e.target.closest('[data-action]'); if(!b)return;
-          const a=b.dataset.action, id=b.dataset.id;
-          if(a==='cerrar'&&id)cerrarEvento(id);
-          if(a==='editar'&&id)alert('Editar evento #'+id+' - En desarrollo');
-          if(a==='editar-producto'&&id)alert('Editar producto #'+id+' - En desarrollo');
-          if(a==='ver-eventos')switchView('eventos');
-          if(a==='ver-ventas')switchView('ventas');
-        });
-
-        $('#filtro-eventos')?.addEventListener('input',(e)=>{
-          const q=e.target.value.toLowerCase();
-          renderEventos(state.eventos.filter(ev=>(ev.nombre||'').toLowerCase().includes(q)||(ev.ubicacion||'').toLowerCase().includes(q)));
-        });
-        $('#filtro-estado')?.addEventListener('change',(e)=>{
-          const st=e.target.value;
-          renderEventos(st?state.eventos.filter(ev=>ev.estado===st):state.eventos);
-        });
-        $('#filtro-bodega')?.addEventListener('input',(e)=>{
-          const q=e.target.value.toLowerCase();
-          renderBodega(state.bodega.filter(p=>(p.nombre||'').toLowerCase().includes(q)||(p.codigo||'').toLowerCase().includes(q)));
-        });
-        $('#filtro-categoria')?.addEventListener('change',(e)=>{
-          const c=e.target.value;
-          renderBodega(c?state.bodega.filter(p=>p.categoria===c):state.bodega);
-        });
-        $('#filtro-stock')?.addEventListener('change',(e)=>{
-          const t=e.target.value;
-          let f=state.bodega;
-          if(t==='bajo')f=state.bodega.filter(p=>(p.stock||0)<5&&(p.stock||0)>0);
-          if(t==='agotado')f=state.bodega.filter(p=>(p.stock||0)===0);
-          renderBodega(f);
+        // Navegación
+        $$('.nav-item').forEach(b => {
+          b.addEventListener('click', () => switchView(b.dataset.view));
         });
       };
 
-      setTimeout(init,200);
+      // Iniciar cuando el DOM esté listo
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+
     })();
   </script>
 </Layout>
