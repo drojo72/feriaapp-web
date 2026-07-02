@@ -198,159 +198,128 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
 
 <script>
   const API_BASE = 'https://feriaapp-api.onrender.com';
-  let productosData = [];
-  let categoriasData = [];
+  let productosCache = [];
+  let categoriasCache = [];
 
   const tbody = document.getElementById('bodega-tbody');
-  const modalStock = document.getElementById('modal-stock');
-  const formStock = document.getElementById('form-stock');
   const filtroTexto = document.getElementById('filtro-productos');
   const filtroCategoria = document.getElementById('filtro-categoria');
   const filtroStock = document.getElementById('filtro-stock');
+  const modalStock = document.getElementById('modal-stock');
+  const formStock = document.getElementById('form-stock');
 
-  async function cargarCategorias() {
+  async function cargarDatos() {
     try {
-      const res = await fetch(`${API_BASE}/categorias`);
-      if (!res.ok) return;
-      categoriasData = await res.json();
+      const [resProd, resCat] = await Promise.all([
+        fetch(`${API_BASE}/productos`),
+        fetch(`${API_BASE}/catalogo/categorias`)
+      ]);
+      productosCache = await resProd.json();
+      categoriasCache = await resCat.json();
+
       filtroCategoria.innerHTML = '<option value="">Todas las categorías</option>' +
-        categoriasData.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
-    } catch (e) { console.error('Error cargando categorías', e); }
-  }
+        categoriasCache.map(c => `<option value="${c.id}">${escapeHtml(c.nombre)}</option>`).join('');
 
-  async function cargarProductos() {
-    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Cargando inventario...</td></tr>';
-    try {
-      const res = await fetch(`${API_BASE}/productos`);
-      if (!res.ok) throw new Error('Error al cargar productos');
-      productosData = await res.json();
-      renderProductos();
+      renderizar(productosCache);
       actualizarStats();
-    } catch (err) {
-      tbody.innerHTML = `<tr><td colspan="7" class="empty-state">Error: ${err.message}</td></tr>`;
+    } catch (e) {
+      tbody.innerHTML = `<tr><td colspan="7" class="empty-state">Error: ${e.message}</td></tr>`;
     }
   }
 
-  function getStockClass(stock) {
-    if (stock === 0) return 'stock-cero';
-    if (stock < 3) return 'stock-bajo';
-    return 'stock-ok';
-  }
+  function renderizar(lista) {
+    const texto = filtroTexto.value.toLowerCase();
+    const cat = filtroCategoria.value;
+    const stockFilter = filtroStock.value;
 
-  function getStockLabel(stock) {
-    if (stock === 0) return 'Agotado';
-    if (stock < 3) return 'Bajo';
-    return 'OK';
-  }
-
-  function renderProductos() {
-    const texto = filtroTexto.value.toLowerCase().trim();
-    const catId = filtroCategoria.value;
-    const stockFiltro = filtroStock.value;
-
-    const filtrados = productosData.filter(p => {
-      const matchTexto = !texto || p.nombre?.toLowerCase().includes(texto) || p.sku?.toLowerCase().includes(texto);
-      const matchCat = !catId || p.categoria_id == catId;
+    const filtrados = lista.filter(p => {
+      const matchTexto = !texto || (p.nombre?.toLowerCase().includes(texto) || p.sku?.toLowerCase().includes(texto));
+      const matchCat = !cat || String(p.categoria_id) === cat;
       let matchStock = true;
-      if (stockFiltro === 'con_stock') matchStock = (p.stock || 0) > 0;
-      if (stockFiltro === 'sin_stock') matchStock = (p.stock || 0) === 0;
-      if (stockFiltro === 'bajo') matchStock = (p.stock || 0) > 0 && (p.stock || 0) < 3;
+      if (stockFilter === 'con_stock') matchStock = (p.stock || 0) > 0;
+      else if (stockFilter === 'sin_stock') matchStock = (p.stock || 0) === 0;
+      else if (stockFilter === 'bajo') matchStock = (p.stock || 0) > 0 && (p.stock || 0) < 3;
       return matchTexto && matchCat && matchStock;
     });
 
     if (filtrados.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No hay productos que coincidan.</td></tr>';
+      tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No hay productos</td></tr>`;
       return;
     }
 
-    tbody.innerHTML = filtrados.map(p => `
+    tbody.innerHTML = filtrados.map(p => {
+      const cat = categoriasCache.find(c => c.id === p.categoria_id);
+      return `
       <tr data-id="${p.id}">
+        <td><strong>${escapeHtml(p.nombre)}</strong><br><small>${escapeHtml(p.sku || '')}</small></td>
+        <td>${escapeHtml(cat?.nombre || '-')}</td>
+        <td>${escapeHtml(p.talla || '-')}</td>
+        <td>${p.stock || 0}</td>
+        <td>$${Number(p.precio_venta || 0).toLocaleString()}</td>
+        <td><span class="badge badge-${p.estado}">${p.estado}</span></td>
         <td>
-          <div style="font-weight:600;color:var(--feria-navy);">${p.nombre}</div>
-          <div style="font-size:var(--text-xs);color:var(--color-muted);">${p.sku || 'Sin SKU'}</div>
+          <button class="btn-icon btn-stock" title="Ajustar stock">📦</button>
+          <button class="btn-icon btn-editar" title="Editar">✏️</button>
         </td>
-        <td>${p.categoria_nombre || p.categoria || '-'}</td>
-        <td>${p.talla || '-'}</td>
-        <td><span class="stock-badge ${getStockClass(p.stock)}">${p.stock || 0} — ${getStockLabel(p.stock)}</span></td>
-        <td style="font-weight:600;">$${(p.precio_venta || 0).toLocaleString('es-CL')}</td>
-        <td>${p.estado || 'activo'}</td>
-        <td>
-          <button class="btn-icon" onclick="ajustarStock(${p.id})" title="Ajustar stock">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>
-          </button>
-          <button class="btn-icon" onclick="editarProducto(${p.id})" title="Editar">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
-          <button class="btn-icon danger" onclick="eliminarProducto(${p.id})" title="Eliminar">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-          </button>
-        </td>
-      </tr>
-    `).join('');
+      </tr>`;
+    }).join('');
+
+    tbody.querySelectorAll('.btn-stock').forEach(btn => {
+      btn.addEventListener('click', () => abrirStock(btn.closest('tr').dataset.id));
+    });
+    tbody.querySelectorAll('.btn-editar').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Mostrar ProductoForm en modo editar - implementar según tu flujo
+        alert('Editar producto ID: ' + btn.closest('tr').dataset.id);
+      });
+    });
   }
 
   function actualizarStats() {
-    const total = productosData.length;
-    const unidades = productosData.reduce((s, p) => s + (p.stock || 0), 0);
-    const valor = productosData.reduce((s, p) => s + ((p.stock || 0) * (p.precio_costo || p.precio_venta || 0)), 0);
-    document.getElementById('stat-total').textContent = total;
-    document.getElementById('stat-stock-total').textContent = unidades;
-    document.getElementById('stat-valor').textContent = '$' + Math.round(valor).toLocaleString('es-CL');
+    document.getElementById('stat-total').textContent = productosCache.length;
+    document.getElementById('stat-stock-total').textContent = productosCache.reduce((s, p) => s + (p.stock || 0), 0);
+    const valor = productosCache.reduce((s, p) => s + (p.stock || 0) * (p.precio_costo || 0), 0);
+    document.getElementById('stat-valor').textContent = '$' + valor.toLocaleString();
   }
 
-  function ajustarStock(id) {
-    const p = productosData.find(x => x.id === id);
+  function abrirStock(id) {
+    const p = productosCache.find(prod => String(prod.id) === id);
     if (!p) return;
     document.getElementById('stock-producto-id').value = p.id;
     document.getElementById('stock-producto-nombre').value = p.nombre;
     document.getElementById('stock-cantidad').value = p.stock || 0;
-    document.getElementById('modal-stock-title').textContent = `Ajustar Stock: ${p.nombre}`;
     modalStock.showModal();
-  }
-
-  async function editarProducto(id) {
-    sessionStorage.setItem('producto_editar_id', id);
-    window.location.href = '/bodega?editar=' + id;
-  }
-
-  async function eliminarProducto(id) {
-    const p = productosData.find(x => x.id === id);
-    if (!confirm(`¿Eliminar "${p?.nombre}" permanentemente?`)) return;
-    try {
-      const res = await fetch(`${API_BASE}/productos/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Error al eliminar');
-      await cargarProductos();
-    } catch (err) { alert('Error: ' + err.message); }
   }
 
   formStock.addEventListener('submit', async (e) => {
     e.preventDefault();
     const id = document.getElementById('stock-producto-id').value;
-    const cantidad = parseInt(document.getElementById('stock-cantidad').value);
-    const motivo = document.getElementById('stock-motivo').value;
+    const cantidad = Number(document.getElementById('stock-cantidad').value);
     try {
       const res = await fetch(`${API_BASE}/productos/${id}/stock`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ stock: cantidad, motivo })
+        body: JSON.stringify({ cantidad })
       });
-      if (!res.ok) throw new Error('Error al actualizar stock');
+      if (!res.ok) throw new Error('Error actualizando stock');
       modalStock.close();
-      await cargarProductos();
-    } catch (err) { alert('Error: ' + err.message); }
+      cargarDatos();
+    } catch (err) { alert(err.message); }
   });
 
   document.getElementById('btn-nuevo-producto').addEventListener('click', () => {
-    sessionStorage.removeItem('producto_editar_id');
-    window.location.href = '/bodega';
+    // Mostrar ProductoForm - implementar según tu flujo
+    alert('Nuevo producto - integrar con ProductoForm');
   });
 
-  modalStock.querySelectorAll('[data-close-modal]').forEach(b => b.addEventListener('click', () => modalStock.close()));
-  modalStock.addEventListener('click', e => { if (e.target === modalStock) modalStock.close(); });
+  document.querySelectorAll('[data-close-modal]').forEach(btn => btn.addEventListener('click', () => modalStock.close()));
+  modalStock.addEventListener('click', (e) => { if (e.target === modalStock) modalStock.close(); });
 
-  filtroTexto.addEventListener('input', renderProductos);
-  filtroCategoria.addEventListener('change', renderProductos);
-  filtroStock.addEventListener('change', renderProductos);
+  filtroTexto.addEventListener('input', () => renderizar(productosCache));
+  filtroCategoria.addEventListener('change', () => renderizar(productosCache));
+  filtroStock.addEventListener('change', () => renderizar(productosCache));
 
-  document.addEventListener('DOMContentLoaded', () => { cargarCategorias(); cargarProductos(); });
+  function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+
+  cargarDatos();
 </script>

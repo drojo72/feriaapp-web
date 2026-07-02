@@ -218,55 +218,70 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
 
 <script>
   const API_BASE = 'https://feriaapp-api.onrender.com';
-  const form = document.getElementById('form-producto');
-  const btnSubmit = form.querySelector('button[type="submit"]');
-  const btnText = btnSubmit.querySelector('.btn-text');
-  const btnSpinner = btnSubmit.querySelector('.btn-spinner');
+  let modo = 'crear';
+  let productoId = null;
 
-  async function cargarSelects() {
+  const selects = {
+    categoria: document.getElementById('prod-categoria'),
+    subcategoria: document.getElementById('prod-subcategoria'),
+    temporada: document.getElementById('prod-temporada'),
+    genero: document.getElementById('prod-genero'),
+    segmento: document.getElementById('prod-segmento'),
+    nivel: document.getElementById('prod-nivel-calidad')
+  };
+
+  async function cargarCatalogos() {
     const endpoints = [
-      { url: '/categorias', el: 'prod-categoria', label: 'nombre' },
-      { url: '/subcategorias', el: 'prod-subcategoria', label: 'nombre' },
-      { url: '/temporadas', el: 'prod-temporada', label: 'nombre' },
-      { url: '/generos', el: 'prod-genero', label: 'nombre' },
-      { url: '/segmentos_edad', el: 'prod-segmento', label: 'nombre' },
-      { url: '/niveles_calidad', el: 'prod-nivel-calidad', label: 'nombre' },
+      ['categorias', selects.categoria],
+      ['subcategorias', selects.subcategoria],
+      ['temporadas', selects.temporada],
+      ['generos', selects.genero],
+      ['segmentos_edad', selects.segmento],
+      ['niveles_calidad', selects.nivel]
     ];
-    for (const cfg of endpoints) {
+    for (const [endpoint, select] of endpoints) {
       try {
-        const res = await fetch(`${API_BASE}${cfg.url}`);
-        if (!res.ok) continue;
+        const res = await fetch(`${API_BASE}/catalogo/${endpoint}`);
         const data = await res.json();
-        const el = document.getElementById(cfg.el);
-        const baseOption = el.options[0];
-        el.innerHTML = '';
-        el.appendChild(baseOption);
-        data.forEach(item => {
-          const opt = document.createElement('option');
-          opt.value = item.id;
-          opt.textContent = item[cfg.label] || item.nombre;
-          el.appendChild(opt);
-        });
-      } catch (e) { console.error(`Error cargando ${cfg.url}`, e); }
+        const currentVal = select.value;
+        select.innerHTML = '<option value="">Seleccionar...</option>' +
+          data.map(item => `<option value="${item.id}">${escapeHtml(item.nombre)}</option>`).join('');
+        select.value = currentVal;
+      } catch (e) { console.error('Error cargando', endpoint, e); }
     }
+
+    // Cascada categoría → subcategoría
+    selects.categoria.addEventListener('change', async () => {
+      const catId = selects.categoria.value;
+      if (!catId) { selects.subcategoria.innerHTML = '<option value="">Seleccionar...</option>'; return; }
+      try {
+        const res = await fetch(`${API_BASE}/catalogo/subcategorias?categoria_id=${catId}`);
+        const data = await res.json();
+        selects.subcategoria.innerHTML = '<option value="">Seleccionar...</option>' +
+          data.map(s => `<option value="${s.id}">${escapeHtml(s.nombre)}</option>`).join('');
+      } catch (e) { console.error(e); }
+    });
   }
 
   async function cargarProducto(id) {
     try {
       const res = await fetch(`${API_BASE}/productos/${id}`);
-      if (!res.ok) throw new Error('No se pudo cargar el producto');
       const p = await res.json();
+      productoId = p.id;
+      modo = 'editar';
       document.getElementById('form-title').textContent = 'Editar Producto';
       document.getElementById('prod-id').value = p.id;
       document.getElementById('prod-nombre').value = p.nombre || '';
       document.getElementById('prod-sku').value = p.sku || '';
       document.getElementById('prod-descripcion').value = p.descripcion || '';
-      document.getElementById('prod-categoria').value = p.categoria_id || '';
-      document.getElementById('prod-subcategoria').value = p.subcategoria_id || '';
-      document.getElementById('prod-temporada').value = p.temporada_id || '';
-      document.getElementById('prod-genero').value = p.genero_id || '';
-      document.getElementById('prod-segmento').value = p.segmento_edad_id || '';
-      document.getElementById('prod-nivel-calidad').value = p.nivel_calidad_id || '';
+      selects.categoria.value = p.categoria_id || '';
+      // Trigger change para cargar subcategorías
+      selects.categoria.dispatchEvent(new Event('change'));
+      setTimeout(() => { selects.subcategoria.value = p.subcategoria_id || ''; }, 100);
+      selects.temporada.value = p.temporada_id || '';
+      selects.genero.value = p.genero_id || '';
+      selects.segmento.value = p.segmento_edad_id || '';
+      selects.nivel.value = p.nivel_calidad_id || '';
       document.getElementById('prod-talla').value = p.talla || '';
       document.getElementById('prod-color').value = p.color || '';
       document.getElementById('prod-material').value = p.material || '';
@@ -277,70 +292,60 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
       document.getElementById('prod-estado').value = p.estado || 'activo';
       document.getElementById('prod-flujo').value = p.flujo_prenda || 'primera_seleccion';
       document.getElementById('prod-etiquetas').value = (p.etiquetas || []).join(', ');
-    } catch (err) {
-      alert('Error cargando producto: ' + err.message);
-    }
+    } catch (e) { alert('Error cargando producto: ' + e.message); }
   }
 
-  form.addEventListener('submit', async (e) => {
+  document.getElementById('form-producto').addEventListener('submit', async (e) => {
     e.preventDefault();
-    btnText.textContent = 'Guardando...';
-    btnSpinner.classList.remove('hidden');
-    btnSubmit.disabled = true;
-
-    const id = document.getElementById('prod-id').value;
     const payload = {
-      nombre: document.getElementById('prod-nombre').value.trim(),
-      sku: document.getElementById('prod-sku').value.trim() || null,
-      descripcion: document.getElementById('prod-descripcion').value.trim() || null,
-      categoria_id: document.getElementById('prod-categoria').value || null,
-      subcategoria_id: document.getElementById('prod-subcategoria').value || null,
-      temporada_id: document.getElementById('prod-temporada').value || null,
-      genero_id: document.getElementById('prod-genero').value || null,
-      segmento_edad_id: document.getElementById('prod-segmento').value || null,
-      nivel_calidad_id: document.getElementById('prod-nivel-calidad').value || null,
-      talla: document.getElementById('prod-talla').value.trim() || null,
-      color: document.getElementById('prod-color').value.trim() || null,
-      material: document.getElementById('prod-material').value.trim() || null,
-      precio_costo: parseFloat(document.getElementById('prod-precio-costo').value) || 0,
-      precio_venta: parseFloat(document.getElementById('prod-precio-venta').value) || 0,
-      precio_rebaja: parseFloat(document.getElementById('prod-precio-rebaja').value) || null,
-      stock: parseInt(document.getElementById('prod-stock').value) || 0,
+      nombre: document.getElementById('prod-nombre').value,
+      sku: document.getElementById('prod-sku').value || null,
+      descripcion: document.getElementById('prod-descripcion').value || null,
+      categoria_id: Number(selects.categoria.value) || null,
+      subcategoria_id: Number(selects.subcategoria.value) || null,
+      temporada_id: Number(selects.temporada.value) || null,
+      genero_id: Number(selects.genero.value) || null,
+      segmento_edad_id: Number(selects.segmento.value) || null,
+      nivel_calidad_id: Number(selects.nivel.value) || null,
+      talla: document.getElementById('prod-talla').value || null,
+      color: document.getElementById('prod-color').value || null,
+      material: document.getElementById('prod-material').value || null,
+      precio_costo: Number(document.getElementById('prod-precio-costo').value) || 0,
+      precio_venta: Number(document.getElementById('prod-precio-venta').value),
+      precio_rebaja: Number(document.getElementById('prod-precio-rebaja').value) || null,
+      stock: Number(document.getElementById('prod-stock').value) || 0,
       estado: document.getElementById('prod-estado').value,
       flujo_prenda: document.getElementById('prod-flujo').value,
       etiquetas: document.getElementById('prod-etiquetas').value.split(',').map(s => s.trim()).filter(Boolean)
     };
 
-    const url = id ? `${API_BASE}/productos/${id}` : `${API_BASE}/productos`;
-    const method = id ? 'PUT' : 'POST';
-
     try {
-      const res = await fetch(url, {
-        method, headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail || `Error ${res.status}`);
-      }
-      window.location.href = '/bodega';
-    } catch (err) {
-      alert('Error al guardar: ' + err.message);
-      btnText.textContent = 'Guardar Producto';
-      btnSpinner.classList.add('hidden');
-      btnSubmit.disabled = false;
-    }
+      const url = modo === 'editar' ? `${API_BASE}/productos/${productoId}` : `${API_BASE}/productos`;
+      const method = modo === 'editar' ? 'PUT' : 'POST';
+      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      if (!res.ok) throw new Error('Error guardando producto');
+      // Volver a bodega
+      document.getElementById('producto-form-container').style.display = 'none';
+      // Recargar lista
+      window.location.reload();
+    } catch (err) { alert(err.message); }
   });
 
-  document.getElementById('btn-volver-bodega').addEventListener('click', () => window.location.href = '/bodega');
-  document.getElementById('btn-cancelar').addEventListener('click', () => window.location.href = '/bodega');
-
-  document.addEventListener('DOMContentLoaded', async () => {
-    await cargarSelects();
-    const editarId = new URLSearchParams(window.location.search).get('editar') || sessionStorage.getItem('producto_editar_id');
-    if (editarId) {
-      sessionStorage.removeItem('producto_editar_id');
-      await cargarProducto(editarId);
-    }
+  document.getElementById('btn-cancelar').addEventListener('click', () => {
+    document.getElementById('producto-form-container').style.display = 'none';
   });
+
+  document.getElementById('btn-volver-bodega').addEventListener('click', () => {
+    document.getElementById('producto-form-container').style.display = 'none';
+  });
+
+  function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+
+  // Inicializar
+  cargarCatalogos();
+
+  // Si hay ID en URL, cargar modo editar
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  if (id) cargarProducto(id);
 </script>

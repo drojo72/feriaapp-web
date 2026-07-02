@@ -339,179 +339,121 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
 
 <script>
   const API_BASE = 'https://feriaapp-api.onrender.com';
-  let eventosData = [];
-  let eventoEditando = null;
+  let eventosCache = [];
 
   const tbody = document.getElementById('eventos-tbody');
+  const filtroTexto = document.getElementById('filtro-eventos');
+  const filtroEstado = document.getElementById('filtro-estado');
   const modal = document.getElementById('modal-evento');
   const form = document.getElementById('form-evento');
   const btnNuevo = document.getElementById('btn-nuevo-evento');
-  const filtroTexto = document.getElementById('filtro-eventos');
-  const filtroEstado = document.getElementById('filtro-estado');
   const modalTitle = document.getElementById('modal-evento-title');
-  const btnSubmit = form.querySelector('button[type="submit"]');
-  const btnText = btnSubmit.querySelector('.btn-text');
-  const btnSpinner = btnSubmit.querySelector('.btn-spinner');
 
   async function cargarEventos() {
-    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Cargando eventos...</td></tr>';
     try {
       const res = await fetch(`${API_BASE}/eventos`);
-      if (!res.ok) throw new Error('Error al cargar eventos');
-      eventosData = await res.json();
-      renderEventos();
-    } catch (err) {
-      tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Error: ${err.message}</td></tr>`;
+      if (!res.ok) throw new Error('Error cargando eventos');
+      eventosCache = await res.json();
+      renderizar(eventosCache);
+    } catch (e) {
+      tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Error: ${e.message}</td></tr>`;
     }
   }
 
-  function formatFecha(fechaStr) {
-    if (!fechaStr) return '-';
-    const d = new Date(fechaStr);
-    return d.toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' });
-  }
-
-  function getBadgeClass(estado) {
-    const map = { activo: 'badge-activo', cerrado: 'badge-cerrado', programado: 'badge-programado' };
-    return map[estado?.toLowerCase()] || 'badge-programado';
-  }
-
-  function renderEventos() {
-    const texto = filtroTexto.value.toLowerCase().trim();
+  function renderizar(lista) {
+    const texto = filtroTexto.value.toLowerCase();
     const estado = filtroEstado.value;
-
-    const filtrados = eventosData.filter(ev => {
-      const matchTexto = !texto ||
-        ev.nombre?.toLowerCase().includes(texto) ||
-        ev.ubicacion?.toLowerCase().includes(texto);
-      const matchEstado = !estado || ev.estado?.toLowerCase() === estado;
+    const filtrados = lista.filter(ev => {
+      const matchTexto = !texto || (ev.nombre?.toLowerCase().includes(texto) || ev.ubicacion?.toLowerCase().includes(texto));
+      const matchEstado = !estado || ev.estado === estado;
       return matchTexto && matchEstado;
     });
 
     if (filtrados.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No hay eventos que coincidan con los filtros.</td></tr>';
+      tbody.innerHTML = `<tr><td colspan="6" class="empty-state">No hay eventos</td></tr>`;
       return;
     }
 
     tbody.innerHTML = filtrados.map(ev => `
       <tr data-id="${ev.id}">
-        <td><strong>${ev.nombre}</strong></td>
-        <td>${formatFecha(ev.fecha)} ${ev.hora ? ev.hora.substring(0,5) : ''}</td>
-        <td>${ev.ubicacion || '-'}</td>
-        <td><span class="badge ${getBadgeClass(ev.estado)}">${ev.estado || 'N/A'}</span></td>
-        <td><span class="ventas-link" onclick="verVentasEvento(${ev.id}, '${ev.nombre.replace(/'/g, "\\'")}')">$${(ev.total_ventas || 0).toLocaleString('es-CL')}</span></td>
+        <td><strong>${escapeHtml(ev.nombre)}</strong></td>
+        <td>${formatearFecha(ev.fecha)} ${ev.hora || ''}</td>
+        <td>${escapeHtml(ev.ubicacion || '-')}</td>
+        <td><span class="badge badge-${ev.estado}">${ev.estado}</span></td>
+        <td>$${Number(ev.total_ventas || 0).toLocaleString()}</td>
         <td>
-          <button class="btn-icon" onclick="editarEvento(${ev.id})" title="Editar">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
-          <button class="btn-icon danger" onclick="eliminarEvento(${ev.id})" title="Eliminar">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-          </button>
+          <button class="btn-icon btn-editar" title="Editar">✏️</button>
+          <button class="btn-icon btn-eliminar" title="Eliminar">🗑️</button>
         </td>
       </tr>
     `).join('');
+
+    tbody.querySelectorAll('.btn-editar').forEach(btn => {
+      btn.addEventListener('click', () => abrirEditar(btn.closest('tr').dataset.id));
+    });
+    tbody.querySelectorAll('.btn-eliminar').forEach(btn => {
+      btn.addEventListener('click', () => eliminarEvento(btn.closest('tr').dataset.id));
+    });
   }
 
-  function abrirModal(editar = false) {
-    modalTitle.textContent = editar ? 'Editar Evento' : 'Nuevo Evento';
-    if (!editar) {
-      form.reset();
-      document.getElementById('evento-id').value = '';
-      eventoEditando = null;
-    }
+  function abrirNuevo() {
+    modalTitle.textContent = 'Nuevo Evento';
+    form.reset();
+    document.getElementById('evento-id').value = '';
     modal.showModal();
-    document.body.style.overflow = 'hidden';
   }
 
-  function cerrarModal() {
-    modal.close();
-    document.body.style.overflow = '';
-    eventoEditando = null;
-  }
-
-  async function editarEvento(id) {
-    const ev = eventosData.find(e => e.id === id);
+  async function abrirEditar(id) {
+    const ev = eventosCache.find(e => String(e.id) === id);
     if (!ev) return;
-    eventoEditando = id;
+    modalTitle.textContent = 'Editar Evento';
     document.getElementById('evento-id').value = ev.id;
     document.getElementById('evento-nombre').value = ev.nombre || '';
     document.getElementById('evento-fecha').value = ev.fecha ? ev.fecha.substring(0,10) : '';
-    document.getElementById('evento-hora').value = ev.hora ? ev.hora.substring(0,5) : '';
+    document.getElementById('evento-hora').value = ev.hora || '';
     document.getElementById('evento-ubicacion').value = ev.ubicacion || '';
     document.getElementById('evento-descripcion').value = ev.descripcion || '';
-    abrirModal(true);
+    modal.showModal();
   }
 
   async function eliminarEvento(id) {
-    const ev = eventosData.find(e => e.id === id);
-    if (!confirm(`¿Eliminar el evento "${ev?.nombre}"? Esta acción no se puede deshacer.`)) return;
+    if (!confirm('¿Eliminar este evento?')) return;
     try {
       const res = await fetch(`${API_BASE}/eventos/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Error al eliminar');
-      await cargarEventos();
-    } catch (err) {
-      alert('Error al eliminar: ' + err.message);
-    }
-  }
-
-  function verVentasEvento(id, nombre) {
-    // Navegar a histórico filtrado por evento
-    sessionStorage.setItem('filtro_evento_id', id);
-    sessionStorage.setItem('filtro_evento_nombre', nombre);
-    window.location.href = '/historico';
+      if (!res.ok) throw new Error('Error eliminando');
+      cargarEventos();
+    } catch (e) { alert(e.message); }
   }
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    btnText.textContent = 'Guardando...';
-    btnSpinner.classList.remove('hidden');
-    btnSubmit.disabled = true;
-
+    const id = document.getElementById('evento-id').value;
     const payload = {
-      nombre: document.getElementById('evento-nombre').value.trim(),
+      nombre: document.getElementById('evento-nombre').value,
       fecha: document.getElementById('evento-fecha').value,
       hora: document.getElementById('evento-hora').value || null,
-      ubicacion: document.getElementById('evento-ubicacion').value.trim() || null,
-      descripcion: document.getElementById('evento-descripcion').value.trim() || null,
-      estado: eventoEditando ? undefined : 'programado'
+      ubicacion: document.getElementById('evento-ubicacion').value || null,
+      descripcion: document.getElementById('evento-descripcion').value || null,
+      estado: id ? undefined : 'activo'
     };
-
-    const url = eventoEditando ? `${API_BASE}/eventos/${eventoEditando}` : `${API_BASE}/eventos`;
-    const method = eventoEditando ? 'PUT' : 'POST';
-
     try {
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail || `Error ${res.status}`);
-      }
-      cerrarModal();
-      await cargarEventos();
-    } catch (err) {
-      alert('Error al guardar: ' + err.message);
-    } finally {
-      btnText.textContent = 'Guardar';
-      btnSpinner.classList.add('hidden');
-      btnSubmit.disabled = false;
-    }
+      const url = id ? `${API_BASE}/eventos/${id}` : `${API_BASE}/eventos`;
+      const method = id ? 'PUT' : 'POST';
+      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      if (!res.ok) throw new Error('Error guardando');
+      modal.close();
+      cargarEventos();
+    } catch (err) { alert(err.message); }
   });
 
-  btnNuevo.addEventListener('click', () => abrirModal(false));
+  btnNuevo.addEventListener('click', abrirNuevo);
+  document.querySelectorAll('[data-close-modal]').forEach(btn => btn.addEventListener('click', () => modal.close()));
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.close(); });
+  filtroTexto.addEventListener('input', () => renderizar(eventosCache));
+  filtroEstado.addEventListener('change', () => renderizar(eventosCache));
 
-  modal.querySelectorAll('[data-close-modal]').forEach(btn => {
-    btn.addEventListener('click', cerrarModal);
-  });
+  function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+  function formatearFecha(fecha) { if (!fecha) return '-'; return new Date(fecha).toLocaleDateString('es-CL'); }
 
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) cerrarModal();
-  });
-
-  filtroTexto.addEventListener('input', renderEventos);
-  filtroEstado.addEventListener('change', renderEventos);
-
-  document.addEventListener('DOMContentLoaded', cargarEventos);
+  cargarEventos();
 </script>
