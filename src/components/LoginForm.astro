@@ -16,10 +16,10 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
       <h1>FeriaApp</h1>
       <p>Panel Administrativo</p>
     </div>
-    <form id="login-form" class="admin-login__form">
+    <form id="login-form" class="admin-login__form" method="POST">
       <div class="form-group">
-        <label for="login-email">Email</label>
-        <input type="email" id="login-email" name="email" placeholder="tu@email.com" required autocomplete="email"/>
+        <label for="login-username">Usuario</label>
+        <input type="text" id="login-username" name="username" placeholder="Tu Nombre" required autocomplete="username"/>
       </div>
       <div class="form-group">
         <label for="login-password">Contraseña</label>
@@ -152,20 +152,25 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
     };
 
     const login = async (em, pw) => {
-    const r = await api('/auth/login', {
-        method: 'POST',
-        body: { email: em, password: pw }
-    });
+        const r = await api('/auth/login', {
+            method: 'POST',
+            body: { username: em, password: pw }
+        });
 
-    if (r?.ok && r.data?.access_token) {
-        localStorage.setItem('feriaapp_token', r.data.access_token);
-        if (r.data.user) {
-            localStorage.setItem('feriaapp_user', JSON.stringify(r.data.user));
+        console.log("Respuesta del servidor:", r);   // ← debug
+
+        if (r?.ok && r.data?.access_token) {
+            localStorage.setItem('feriaapp_token', r.data.access_token);
+            if (r.data.user?.nombre) {
+                localStorage.setItem('feriaapp_user', JSON.stringify(r.data.user));
+            }
+            console.log("✅ Login exitoso - Redirigiendo...");
+            return true;
+        } else {
+            console.log("❌ Falló login:", r);
+            return false;
         }
-        return true;
-    }
-    return false;
-};
+    };
 
     const form = document.getElementById('login-form');
     form?.addEventListener('submit', async (e) => {
@@ -181,7 +186,7 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
       btn.disabled = true;
 
       const ok = await login(
-        document.getElementById('login-email').value.trim(),
+        document.getElementById('login-username').value.trim(),
         document.getElementById('login-password').value
       );
 
@@ -190,10 +195,12 @@ const API_BASE = 'https://feriaapp-api.onrender.com';
       btn.disabled = false;
 
       if (ok) {
-        window.location.reload();
+          setTimeout(() => {
+              window.location.reload();   // o window.location.href = '/admin' o dashboard
+          }, 300);
       } else {
         if (errEl) {
-          errEl.textContent = 'Email o contraseña incorrectos.';
+          errEl.textContent = 'Usuario o contraseña incorrectos.';
           errEl.classList.remove('hidden');
         }
       }
