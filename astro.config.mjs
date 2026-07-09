@@ -1,19 +1,18 @@
+// astro.config.mjs
 import { defineConfig } from 'astro/config';
+import cloudflare from '@astrojs/cloudflare'; // adapter para Cloudflare
 
-// https://astro.build/config
 export default defineConfig({
-  output: 'hybrid',  // ← Páginas estáticas + endpoints dinámicos
+  output: 'static',        // ← Default, ya soporta dinámico
+  adapter: cloudflare(),   // ← Para deploy en Cloudflare Pages
   site: 'https://feriaapp-web.pages.dev',
   build: {
     format: 'directory'
   },
   vite: {
-    css: {
-      devSourcemap: true
-    },
+    css: { devSourcemap: true },
     server: {
       proxy: {
-        // Proxy local para desarrollo (npm run dev)
         '/api': {
           target: 'https://feriaapp-api.onrender.com',
           changeOrigin: true,
