@@ -976,17 +976,22 @@ const API_BASE = import.meta.env.PUBLIC_API_URL || 'https://feriaapp-api.onrende
       const loadDashboardData = async () => {
         // Solo para mostrar stats básicos
         try {
-          const [ev, prod, ventas] = await Promise.all([
+          const [ev, prod, ventas] = await Promise.allSettled([
             api('/eventos?estado=activo&limit=1'),
-            api('/productos/bodega?limit=1'),
+            api('/catalogo/productos?estado=bodega&limit=1'),
             api('/ventas?limit=1')
           ]);
           const elEventos = $('#stat-eventos');
           const elBodega = $('#stat-bodega');
           const elVentas = $('#stat-ventas');
-          if (elEventos) elEventos.textContent = ev?.data?.length || 0;
-          if (elBodega) elBodega.textContent = prod?.data?.length || 0;
-          if (elVentas) elVentas.textContent = ventas?.data?.length || 0;
+          if (elEventos) elEventos.textContent = ev.status === 'fulfilled' ? (ev.value?.data?.length || 0) : '—';
+          if (elBodega) elBodega.textContent = prod.status === 'fulfilled' ? (prod.value?.data?.length || 0) : '—';
+          if (elVentas) elVentas.textContent = ventas.status === 'fulfilled' ? (ventas.value?.data?.length || 0) : '—';
+
+          // Log errors individually
+          [ev, prod, ventas].forEach((r, i) => {
+            if (r.status === 'rejected') console.warn('Stat error:', ['eventos','productos','ventas'][i], r.reason);
+          });
         } catch (e) {
           console.warn('Error loading stats:', e);
         }
