@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-const API_BASE = '/api';
+const API_BASE = import.meta.env.PUBLIC_API_URL || 'https://feriaapp-api.onrender.com';
 ---
 
 <Layout title="FeriaApp - Panel Administrativo">

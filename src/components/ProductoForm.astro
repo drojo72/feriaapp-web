@@ -1,61 +1,368 @@
 ---
-const API_BASE = '/api';
+const API_BASE = 'https://feriaapp-api.onrender.com';
 ---
 
-<!-- ... mismo HTML hasta la sección de etiquetas ... -->
+<div class="view-section" id="producto-form-section">
+  <div class="view-header">
+    <h3 id="form-title">Nuevo Producto</h3>
+    <button class="btn btn-outline btn-sm" id="btn-volver-bodega">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Volver a Bodega
+    </button>
+  </div>
 
-<div class="form-section">
-  <h4>📖 Historia del Producto</h4>
-  <div class="form-group">
-    <label for="prod-historia">Historia / Origen</label>
-    <textarea id="prod-historia" rows="3" placeholder="Ej: Donación de familia en La Dehesa. Ropa de nieta que creció rápido, usado solo 2 veces."></textarea>
-    <small style="color: var(--color-muted); font-size: var(--text-xs);">Cada prenda tiene una historia. Esto conecta con el comprador.</small>
-  </div>
-  <div class="form-row">
-    <div class="form-group">
-      <label for="prod-ubicacion">Ubicación de origen</label>
-      <input type="text" id="prod-ubicacion" placeholder="Ej: La Dehesa, Ñuñoa, Talca..."/>
+  <form id="form-producto" class="producto-form">
+    <input type="hidden" id="prod-id"/>
+
+    <div class="form-section">
+      <h4>Información General</h4>
+      <div class="form-row">
+        <div class="form-group wide">
+          <label for="prod-nombre">Nombre del Producto *</label>
+          <input type="text" id="prod-nombre" required placeholder="Ej: Polera de lino azul marino"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="prod-notas">Notas / Descripción</label>
+        <textarea id="prod-notas" rows="2" placeholder="Detalles del producto..."></textarea>
+      </div>
     </div>
-    <div class="form-group">
-      <label for="prod-motivo">Motivo de donación</label>
-      <select id="prod-motivo">
-        <option value="">Seleccionar...</option>
-        <option value="renovacion">Renovación de clóset</option>
-        <option value="herencia">Herencia familiar</option>
-        <option value="limpieza">Limpieza / Mudanza</option>
-        <option value="viaje">Viaje / Mudanza al sur</option>
-        <option value="crecimiento">Crecimiento (bebé/niño)</option>
-        <option value="cambio_gustos">Cambio de gustos</option>
-        <option value="otro">Otro</option>
-      </select>
+
+    <div class="form-section">
+      <h4>Categorización</h4>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="prod-categoria-feria">Categoría FeriaApp</label>
+          <select id="prod-categoria-feria">
+            <option value="">Seleccionar...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="prod-categoria-revistete">Categoría Re-Vistete</label>
+          <select id="prod-categoria-revistete">
+            <option value="">Seleccionar...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="prod-subcategoria-revistete">Subcategoría Re-Vistete</label>
+          <select id="prod-subcategoria-revistete">
+            <option value="">Seleccionar...</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="prod-genero">Género</label>
+          <select id="prod-genero">
+            <option value="">Seleccionar...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="prod-segmento">Segmento Edad</label>
+          <select id="prod-segmento">
+            <option value="">Seleccionar...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="prod-nivel-calidad">Nivel Calidad</label>
+          <select id="prod-nivel-calidad">
+            <option value="">Seleccionar...</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="prod-temporada">Temporada</label>
+          <select id="prod-temporada">
+            <option value="">Ninguna</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="prod-condicion">Condición</label>
+          <select id="prod-condicion">
+            <option value="nuevo">Nuevo</option>
+            <option value="como_nuevo">Como nuevo</option>
+            <option value="bueno">Bueno</option>
+            <option value="regular">Regular</option>
+            <option value="necesita_reparacion">Necesita reparación</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="prod-marca">Marca</label>
+          <input type="text" id="prod-marca" placeholder="Ej: Zara, H&M, Artesanal..."/>
+        </div>
+      </div>
     </div>
-  </div>
+
+    <div class="form-section">
+      <h4>Detalles Físicos</h4>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="prod-talla">Talla</label>
+          <input type="text" id="prod-talla" placeholder="Ej: M, 42, Única"/>
+        </div>
+        <div class="form-group">
+          <label for="prod-talla-numerica">Talla Numérica</label>
+          <input type="number" id="prod-talla-numerica" min="0" step="1" placeholder="Ej: 38"/>
+        </div>
+        <div class="form-group">
+          <label for="prod-medidas">Medidas</label>
+          <input type="text" id="prod-medidas" placeholder="Ej: 50x60 cm"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h4>Precios</h4>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="prod-precio-online">Precio Online ($)</label>
+          <input type="number" id="prod-precio-online" min="0" step="100" placeholder="0"/>
+        </div>
+        <div class="form-group">
+          <label for="prod-precio-feria">Precio Feria ($)</label>
+          <input type="number" id="prod-precio-feria" min="0" step="100" placeholder="0"/>
+        </div>
+        <div class="form-group">
+          <label for="prod-precio-standard">Precio Standard ($)</label>
+          <input type="number" id="prod-precio-standard" min="0" step="100" placeholder="0"/>
+        </div>
+        <div class="form-group">
+          <label for="prod-precio-final">Precio Final ($)</label>
+          <input type="number" id="prod-precio-final" min="0" step="100" placeholder="0"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h4>Defectos y Fotos</h4>
+      <div class="form-group">
+        <label for="prod-descripcion-defectos">Descripción de Defectos</label>
+        <textarea id="prod-descripcion-defectos" rows="2" placeholder="Detallar cualquier defecto visible..."></textarea>
+      </div>
+      <div class="form-group">
+        <label for="prod-fotos">Fotos (URLs separadas por coma)</label>
+        <input type="text" id="prod-fotos" placeholder="https://... , https://..."/>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-outline" id="btn-cancelar">Cancelar</button>
+      <button type="submit" class="btn btn-primary btn-lg">
+        <span class="btn-text">Guardar Producto</span>
+        <span class="btn-spinner hidden"></span>
+      </button>
+    </div>
+  </form>
 </div>
 
-<!-- ... resto del formulario ... -->
+<style>
+  .view-section { margin-bottom: var(--space-8); max-width: 900px; }
+  .view-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);
+  }
+  .view-header h3 {
+    font-family: var(--font-serif); font-size: var(--text-2xl);
+    color: var(--feria-navy); margin: 0;
+  }
+
+  .producto-form {
+    background: var(--color-card-bg); border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl); box-shadow: var(--shadow-sm);
+  }
+
+  .form-section {
+    padding: var(--space-6); border-bottom: 1px solid var(--color-border);
+  }
+  .form-section:last-of-type { border-bottom: none; }
+  .form-section h4 {
+    font-family: var(--font-serif); font-size: var(--text-lg);
+    color: var(--feria-navy); margin: 0 0 var(--space-4) 0;
+    padding-bottom: var(--space-2); border-bottom: 2px solid var(--feria-gold);
+    display: inline-block;
+  }
+
+  .form-row {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-4); margin-bottom: var(--space-2);
+  }
+  .form-group { margin-bottom: var(--space-4); }
+  .form-group.wide { grid-column: 1 / -1; }
+  .form-group label {
+    display: block; font-size: var(--text-sm); font-weight: 600;
+    color: var(--feria-navy); margin-bottom: var(--space-2);
+  }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: var(--space-3) var(--space-4); border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg); font-size: var(--text-base); color: var(--color-text);
+    background: var(--color-card-bg); transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline: none; border-color: var(--feria-gold); box-shadow: 0 0 0 3px rgba(203, 168, 107, 0.15);
+  }
+
+  .form-actions {
+    display: flex; justify-content: flex-end; gap: var(--space-4);
+    padding: var(--space-6); background: var(--color-muted-bg, rgba(203,168,107,0.03));
+    border-top: 1px solid var(--color-border); border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+    position: sticky; bottom: 0;
+  }
+
+  .btn-spinner {
+    display: inline-block; width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3); border-top-color: white;
+    border-radius: 50%; animation: spin 0.8s linear infinite;
+    margin-left: var(--space-2); vertical-align: middle;
+  }
+  .btn-spinner.hidden { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
 
 <script>
-  // ... código existente ...
+  const API_BASE = 'https://feriaapp-api.onrender.com';
+
+  // ── Auth helper ──
+  const getToken = () => localStorage.getItem('feriaapp_token');
+
+  const api = async (endpoint, opts = {}) => {
+    const token = getToken();
+    const res = await fetch(API_BASE + endpoint, {
+      ...opts,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': 'Bearer ' + token } : {}),
+        ...opts.headers
+      },
+      body: opts.body ? JSON.stringify(opts.body) : undefined
+    });
+    if (res.status === 401) {
+      localStorage.removeItem('feriaapp_token');
+      window.location.href = '/admin';
+      return null;
+    }
+    const data = await res.json().catch(() => null);
+    return { ok: res.ok, status: res.status, data };
+  };
+
+  const form = document.getElementById('form-producto');
+  const btnSubmit = form.querySelector('button[type="submit"]');
+  const btnText = btnSubmit.querySelector('.btn-text');
+  const btnSpinner = btnSubmit.querySelector('.btn-spinner');
+
+  async function cargarSelects() {
+    const endpoints = [
+      { url: '/catalogo/categorias', el: 'prod-categoria-feria', label: 'nombre' },
+      { url: '/catalogo/categorias-revistete', el: 'prod-categoria-revistete', label: 'nombre' },
+      { url: '/catalogo/generos', el: 'prod-genero', label: 'nombre' },
+      { url: '/catalogo/segmentos-edad', el: 'prod-segmento', label: 'nombre' },
+    ];
+    for (const cfg of endpoints) {
+      try {
+        const r = await api(cfg.url);
+        if (!r?.ok) continue;
+        const el = document.getElementById(cfg.el);
+        const baseOption = el.options[0];
+        el.innerHTML = '';
+        el.appendChild(baseOption);
+        r.data.forEach(item => {
+          const opt = document.createElement('option');
+          opt.value = item.id;
+          opt.textContent = item[cfg.label] || item.nombre || item.codigo;
+          el.appendChild(opt);
+        });
+      } catch (e) { console.error('Error cargando ' + cfg.url, e); }
+    }
+  }
 
   async function cargarProducto(id) {
     try {
-      const res = await fetch(`${API_BASE}/productos/bodega/${id}`);
-      const p = await res.json();
-      // ... campos existentes ...
-      document.getElementById('prod-historia').value = p.historia_origen || '';
-      document.getElementById('prod-ubicacion').value = p.historia_ubicacion || '';
-      document.getElementById('prod-motivo').value = p.historia_motivo || '';
-    } catch (e) { alert('Error cargando producto: ' + e.message); }
+      const r = await api('/productos/bodega/' + id);
+      if (!r?.ok) throw new Error('No se pudo cargar el producto');
+      const p = r.data;
+      document.getElementById('form-title').textContent = 'Editar Producto';
+      document.getElementById('prod-id').value = p.id;
+      document.getElementById('prod-nombre').value = p.nombre || '';
+      document.getElementById('prod-notas').value = p.notas || '';
+      document.getElementById('prod-categoria-feria').value = p.categoria_feriaapp_id || '';
+      document.getElementById('prod-categoria-revistete').value = p.categoria_revistete_id || '';
+      document.getElementById('prod-subcategoria-revistete').value = p.subcategoria_revistete_id || '';
+      document.getElementById('prod-genero').value = p.genero_id || '';
+      document.getElementById('prod-segmento').value = p.segmento_edad_id || '';
+      document.getElementById('prod-nivel-calidad').value = p.nivel_calidad_id || '';
+      document.getElementById('prod-temporada').value = p.temporada_id || '';
+      document.getElementById('prod-condicion').value = p.condicion || 'nuevo';
+      document.getElementById('prod-marca').value = p.marca || '';
+      document.getElementById('prod-talla').value = p.talla || '';
+      document.getElementById('prod-talla-numerica').value = p.talla_numerica || '';
+      document.getElementById('prod-medidas').value = p.medidas || '';
+      document.getElementById('prod-precio-online').value = p.precio_online || '';
+      document.getElementById('prod-precio-feria').value = p.precio_feria || '';
+      document.getElementById('prod-precio-standard').value = p.precio_standard || '';
+      document.getElementById('prod-precio-final').value = p.precio_final || '';
+      document.getElementById('prod-descripcion-defectos').value = p.descripcion_defectos || '';
+      document.getElementById('prod-fotos').value = (p.fotos || []).join(', ');
+    } catch (err) {
+      alert('Error cargando producto: ' + err.message);
+    }
   }
 
-  document.getElementById('form-producto').addEventListener('submit', async (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    btnText.textContent = 'Guardando...';
+    btnSpinner.classList.remove('hidden');
+    btnSubmit.disabled = true;
+
+    const id = document.getElementById('prod-id').value;
     const payload = {
-      // ... campos existentes ...
-      historia_origen: document.getElementById('prod-historia').value || null,
-      historia_ubicacion: document.getElementById('prod-ubicacion').value || null,
-      historia_motivo: document.getElementById('prod-motivo').value || null
+      nombre: document.getElementById('prod-nombre').value.trim(),
+      categoria_feriaapp_id: parseInt(document.getElementById('prod-categoria-feria').value) || null,
+      categoria_revistete_id: parseInt(document.getElementById('prod-categoria-revistete').value) || null,
+      subcategoria_revistete_id: parseInt(document.getElementById('prod-subcategoria-revistete').value) || null,
+      genero_id: parseInt(document.getElementById('prod-genero').value) || null,
+      segmento_edad_id: parseInt(document.getElementById('prod-segmento').value) || null,
+      talla: document.getElementById('prod-talla').value.trim() || null,
+      talla_numerica: parseInt(document.getElementById('prod-talla-numerica').value) || null,
+      medidas: document.getElementById('prod-medidas').value.trim() || null,
+      precio_online: parseFloat(document.getElementById('prod-precio-online').value) || null,
+      precio_feria: parseFloat(document.getElementById('prod-precio-feria').value) || null,
+      precio_standard: parseFloat(document.getElementById('prod-precio-standard').value) || null,
+      precio_final: parseFloat(document.getElementById('prod-precio-final').value) || null,
+      condicion: document.getElementById('prod-condicion').value,
+      marca: document.getElementById('prod-marca').value.trim() || null,
+      nivel_calidad_id: parseInt(document.getElementById('prod-nivel-calidad').value) || null,
+      temporada_id: parseInt(document.getElementById('prod-temporada').value) || null,
+      descripcion_defectos: document.getElementById('prod-descripcion-defectos').value.trim() || null,
+      fotos: document.getElementById('prod-fotos').value.split(',').map(s => s.trim()).filter(Boolean),
+      notas: document.getElementById('prod-notas').value.trim() || null
     };
-    // ... resto del submit ...
+
+    const url = id ? '/productos/bodega/' + id : '/productos/bodega';
+    const method = id ? 'PUT' : 'POST';
+
+    try {
+      const r = await api(url, { method, body: payload });
+      if (!r?.ok) {
+        throw new Error(r?.data?.detail || 'Error ' + (r?.status || 'desconocido'));
+      }
+      window.location.href = '/bodega';
+    } catch (err) {
+      alert('Error al guardar: ' + err.message);
+      btnText.textContent = 'Guardar Producto';
+      btnSpinner.classList.add('hidden');
+      btnSubmit.disabled = false;
+    }
+  });
+
+  document.getElementById('btn-volver-bodega').addEventListener('click', () => window.location.href = '/bodega');
+  document.getElementById('btn-cancelar').addEventListener('click', () => window.location.href = '/bodega');
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    await cargarSelects();
+    const editarId = new URLSearchParams(window.location.search).get('editar') || sessionStorage.getItem('producto_editar_id');
+    if (editarId) {
+      sessionStorage.removeItem('producto_editar_id');
+      await cargarProducto(editarId);
+    }
   });
 </script>
