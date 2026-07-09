@@ -2,7 +2,7 @@ import { defineConfig } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
-  output: 'hybrid',  // ← Páginas estáticas + endpoints dinámicos
+  output: 'static',  // ← Páginas estáticas + endpoints dinámicos
   site: 'https://feriaapp-web.pages.dev',
   build: {
     format: 'directory'
