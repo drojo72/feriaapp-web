@@ -371,7 +371,7 @@ const API_BASE = import.meta.env.PUBLIC_API_URL || 'https://feriaapp-api.onrende
           <form id="form-reabrir" class="modal-form">
             <input type="hidden" id="reabrir-evento-id"/>
             <div class="form-group">
-              <label>Evento</label>
+              <label for="reabrir-evento-nombre">Evento</label>
               <input type="text" id="reabrir-evento-nombre" readonly style="background:var(--color-muted-bg);"/>
             </div>
             <div class="form-group">
@@ -762,6 +762,9 @@ const API_BASE = import.meta.env.PUBLIC_API_URL || 'https://feriaapp-api.onrende
       max-height: none;
       pointer-events: auto;
     }
+    .admin-modal:not([open]) {
+      display: none;
+    }
     .admin-modal[open] { display: flex; }
     .admin-modal::backdrop { background: rgba(17, 42, 70, 0.5); }
     .modal-content {
@@ -883,34 +886,21 @@ const API_BASE = import.meta.env.PUBLIC_API_URL || 'https://feriaapp-api.onrende
 
       // ── Auth ──
       const login = async (username, password) => {
-          const formData = new URLSearchParams();
-          formData.append('username', username);
-          formData.append('password', password);
+          const r = await api('/auth/login', {
+              method: 'POST',
+              body: { username, password }
+          });
 
-          try {
-              const res = await fetch(API_BASE + '/auth/login', {
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/x-www-form-urlencoded',
-                  },
-                  body: formData
-              });
-              const data = await res.json().catch(() => null);
-
-              if (res.ok && data?.access_token) {        // ← ✅ access_token
-                  state.token = data.access_token;
-                  state.user = data.user || { nombre: username };
-                  localStorage.setItem('feriaapp_token', data.access_token);
-                  if (data.user) {
-                      localStorage.setItem('feriaapp_user', JSON.stringify(data.user));
-                  }
-                  return true;
+          if (r?.ok && r.data?.access_token) {
+              state.token = r.data.access_token;
+              state.user = r.data.user || { nombre: username };
+              localStorage.setItem('feriaapp_token', r.data.access_token);
+              if (r.data.user) {
+                  localStorage.setItem('feriaapp_user', JSON.stringify(r.data.user));
               }
-              return false;
-          } catch (e) {
-              console.error('Login error:', e);
-              return false;
+              return true;
           }
+          return false;
       };
 
       const logout = () => {
@@ -1412,7 +1402,6 @@ const API_BASE = import.meta.env.PUBLIC_API_URL || 'https://feriaapp-api.onrende
           showLogin();
         }
 
-        /*
         document.getElementById('login-form')?.addEventListener('submit', async (e) => {
           e.preventDefault();
           document.getElementById('login-error')?.classList.add('hidden');
@@ -1426,12 +1415,11 @@ const API_BASE = import.meta.env.PUBLIC_API_URL || 'https://feriaapp-api.onrende
           } else {
             const le = document.getElementById('login-error');
             if (le) {
-              le.textContent = 'Email o contraseña incorrectos.';
+              le.textContent = 'Usuario o contraseña incorrectos.';
               le.classList.remove('hidden');
             }
           }
         });
-        */
 
         $$('.nav-item').forEach(b => {
           b.addEventListener('click', () => switchView(b.dataset.view));
