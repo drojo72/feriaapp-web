@@ -1429,6 +1429,37 @@ const API_BASE = import.meta.env.PUBLIC_API_URL || 'https://feriaapp-api.onrende
         $$('.nav-item').forEach(b => {
           b.addEventListener('click', () => switchView(b.dataset.view));
         });
+
+        // "Ver Todo" buttons
+        document.querySelectorAll('[data-action="ver-eventos"]').forEach(btn => {
+          btn.addEventListener('click', () => switchView('eventos'));
+        });
+        document.querySelectorAll('[data-action="ver-ventas"]').forEach(btn => {
+          btn.addEventListener('click', () => switchView('ventas'));
+        });
+        document.querySelectorAll('[data-action="ver-bodega"]').forEach(btn => {
+          btn.addEventListener('click', () => switchView('bodega'));
+        });
+
+        // "Nuevo" buttons
+        document.querySelectorAll('[data-action="nuevo-evento"]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            switchView('eventos');
+            document.getElementById('modal-nuevo')?.showModal?.();
+          });
+        });
+        document.querySelectorAll('[data-action="nueva-venta"]').forEach(btn => {
+          btn.addEventListener('click', () => switchView('ventas'));
+        });
+        document.querySelectorAll('[data-action="nuevo-producto"]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            window.location.href = '/producto/nuevo';
+          });
+        });
+
+        // Sidebar controls
+        document.getElementById('sidebar-overlay')?.addEventListener('click', closeSidebar);
+        document.getElementById('menu-toggle')?.addEventListener('click', toggleSidebar);
       };
 
       if (document.readyState === 'loading') {
