@@ -1,3 +1,4 @@
+# .github/workflows/deploy.yml
 name: Deploy to Cloudflare Pages
 
 on:
@@ -11,12 +12,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22  # ← Node 22 en vez de 20
       - run: npm ci
       - run: npm run build
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: feriaapp-web
           directory: dist
