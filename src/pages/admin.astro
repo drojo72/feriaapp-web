@@ -947,6 +947,7 @@ const API_BASE = import.meta.env.PUBLIC_API_URL || 'https://feriaapp-api.onrende
           if (ae) ae.textContent = (u.nombre?.[0] || u.email?.[0] || 'A').toUpperCase();
         }
         loadDashboardData();
+        switchView('resumen');
       };
 
       // ── Navigation ──
